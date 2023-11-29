@@ -1,0 +1,8 @@
+[
+  { "target": "https://unagibet.onrender.com/", "shrinked": "unagi" },
+  { "target": "https://id-validator-js.netlify.app/", "shrinked": "id-val" },
+  {
+    "target": "https://id-validator-reactjs.onrender.com/",
+    "shrinked": "id-val2"
+  }
+]
