@@ -1,8 +1,26 @@
 [
-  { "target": "https://unagibet.onrender.com/", "shrinked": "unagi" },
-  { "target": "https://id-validator-js.netlify.app/", "shrinked": "id-val" },
   {
+    "id": 1,
+    "target": "https://unagibet.onrender.com/",
+    "shrinked": "unagi",
+    "visits": 0,
+    "last_visit": "None",
+    "last_visit_ms": 0
+  },
+  {
+    "id": 2,
+    "target": "https://id-validator-js.netlify.app/",
+    "shrinked": "id-val",
+    "visits": 0,
+    "last_visit": "None",
+    "last_visit_ms": 0
+  },
+  {
+    "id": 3,
     "target": "https://id-validator-reactjs.onrender.com/",
-    "shrinked": "id-val2"
+    "shrinked": "id-val2",
+    "visits": 0,
+    "last_visit": "None",
+    "last_visit_ms": 0
   }
 ]
