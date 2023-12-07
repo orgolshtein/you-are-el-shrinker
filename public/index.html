@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        .hidden{
+            display: none;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honey, I Shrunk The Links [TEST]</title>
+</head>
+<body>
+    <div id="input">
+        <form action="">
+            <input type="text" id="target-link-input" placeholder="Target URL">
+            <button type="button" onclick="{getShrinkedURL()}">Submit</button>
+        </form>
+    </div>
+    <div id="output-container" class="hidden">
+        <span id="output">--Output Placeholder--</span>
+        <button type="button" id="edit-button" onclick="{openEditor()}">Edit</button>
+    </div>
+    <form id="editor" class="hidden">
+        <input type="text" id="custom-link-input" placeholder="Custom link">
+        <button type="button" onclick="{editLink()}">Submit</button>
+        <button type="button" onclick="{closeEditor()}">Close</button>
+    </form>
+    <button type="button" onclick="{resetData()}">Reset</button>
+    <script>
+        let id;
+
+        window.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.querySelector("button").click();
+        }
+        });
+
+        function openEditor(){
+            document.querySelector("#editor").classList.remove("hidden")
+        };
+
+        function closeEditor(){
+            document.querySelector("#editor").classList.add("hidden")
+        };
+
+        async function getShrinkedURL(){
+            try {
+                const target = document.querySelector("#target-link-input").value.replaceAll("\"","").replace("http://", "").replace("https://", "");
+                const url = `http://localhost:3020/api/create/${target}`;
+                const options = {
+                method: 'POST' 
+                };
+                const res = await fetch(url,options)
+                const data = await res.json();
+                document.querySelector("#output-container").classList.remove("hidden");
+                if (data.shrinked){
+                    document.querySelector("#output").innerHTML = `<a href="http://localhost:3020/${data.shrinked}" target="_blank">http://localhost:3020/${data.shrinked}<a>`
+                    id = data.id;
+                    document.querySelector("#edit-button").classList.remove("hidden");
+                } else{
+                    document.querySelector("#output").innerHTML = `<span style="color: red">${data}</span>`
+                    document.querySelector("#edit-button").classList.add("hidden");
+
+                }
+            }
+            catch (err) {
+                document.querySelector("#output").innerHTML = `<span style="color: red">${err.message}</span>`;
+                document.querySelector("#edit-button").classList.add("hidden");
+            }
+        };
+
+        async function editLink(){
+            try{
+                const url = `http://localhost:3020/api/edit/${id}`;
+                const options = {
+                    method: 'PATCH',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        shrinked: document.querySelector("#custom-link-input").value.replaceAll("\"","")
+                    })
+                };
+                const res = await fetch(url,options)
+                const data = await res.json();
+                data.shrinked?
+                document.querySelector("#output").innerHTML = `<a href="http://localhost:3020/${data.shrinked}" target="_blank">http://localhost:3020/${data.shrinked}<a>` :
+                document.querySelector("#output").innerHTML = `<span style="color: red">${data}</span>`
+            }catch (err) {
+                document.querySelector("#output").innerHTML = `<span style="color: red">${err.message}</span>`;
+            }
+        }
+
+        async function resetData(){
+            try{
+                const url = "http://localhost:3020/api/edit/reset/data/totest";
+                const options = {
+                    method: 'PUT'
+                };
+                await fetch(url,options);
+                location.reload();
+                alert("data reset");
+            }catch (err) {
+                alert(err.message);
+            }
+        }
+    </script>
+</body>
+</html>
