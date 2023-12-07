@@ -26,6 +26,8 @@ const app: Express = express();
 export const port: string | undefined = process.env.PORT;
 export const host: string | undefined = process.env.HOST;
 
+let res404: string;
+
 app.use(cors());
 
 app.use(morgan("dev"));
@@ -42,6 +44,7 @@ export const writeToUrlData = async (payload:any): Promise<void> => {
 
 app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> =>{
   try{
+    res404 = `Path "${req.url}" not found for method "${req.method}"`
     const urlData: string = await fs.readFile("./data/url-data.json", "utf8");
     linksArray = JSON.parse(urlData);
     next();
@@ -55,20 +58,23 @@ app.use("/api/edit", editRouter);
 app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  let chosenLinkObj: UrlObject[] = linksArray.filter(item => item.shrinked === req.params.shrinked);
-  if (chosenLinkObj.length){
-    linksArray.forEach((item, i)=> {
-      if (item.shrinked === req.params.shrinked){
-        item.visits++;
-        item.last_visit = new Date(Date.now()).toString();
-        item.last_visit_ms = Date.now()
-      }
-      linksArray.splice(i,1,item);
-    })
-    await writeToUrlData(linksArray);
-    res.redirect(chosenLinkObj[0].target)
-  } else {
-    let err: Error = new Error("Path not found");
+  try{
+    let chosenLinkObj: UrlObject[] = linksArray.filter(item => item.shrinked === req.params.shrinked);
+    if (chosenLinkObj.length){
+      linksArray.forEach((item, i)=> {
+        if (item.shrinked === req.params.shrinked){
+          item.visits++;
+          item.last_visit = new Date(Date.now()).toString();
+          item.last_visit_ms = Date.now()
+        }
+        linksArray.splice(i,1,item);
+      })
+      await writeToUrlData(linksArray);
+      res.redirect(chosenLinkObj[0].target)
+    } else {
+      res.status(404).send(res404)
+    }
+  }catch (err){
     next(err)
   }
 });
@@ -80,7 +86,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void =>{
 });
 
 app.use("*", (req: Request, res: Response): void =>{
-  res.status(404).send(`${req.url} not found for method ${req.method}`)
+  res.status(404).send(res404)
 });
 
 app.listen( {port, host}, () : void => {
