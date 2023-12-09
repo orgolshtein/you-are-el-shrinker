@@ -61,7 +61,7 @@ app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): P
   try{
     let chosenLinkObj: UrlObject[] = linksArray.filter(item => item.shrinked === req.params.shrinked);
     if (chosenLinkObj.length){
-      linksArray.forEach((item, i)=> {
+      linksArray.forEach((item, i): void => {
         if (item.shrinked === req.params.shrinked){
           item.visits++;
           item.last_visit = new Date(Date.now()).toString();
@@ -85,7 +85,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void =>{
   res.status(500).json(err.message)
 });
 
-app.use("*", (req: Request, res: Response): void =>{
+app.use("*", (_, res: Response): void =>{
   res.status(404).send(res404)
 });
 
