@@ -1,7 +1,7 @@
-import { Router, NextFunction, Request, Response, RequestParamHandler } from "express";
+import { Router, Request, Response } from "express";
 import bodyParser from "body-parser";
 
-import { UrlObject, linksArray, writeToUrlData } from "../index";
+import { linksArray } from "../index";
 
 const router = Router();
 
