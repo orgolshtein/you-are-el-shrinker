@@ -11,7 +11,7 @@ import analyticsRouter from "./routes/analytics.router";
 
 dotenv.config();
 
-export interface UrlObject {
+export interface LinkObject {
   id: number;
   target: string;
   shrinked: string;
@@ -20,13 +20,24 @@ export interface UrlObject {
   last_visit_ms: number;
 }
 
-export let linksArray:UrlObject[]
+export interface StatsObject {
+  site: string;
+  clicks: number;
+  redirects: number;
+  last_visit: string;
+  last_visit_ms: number;
+}
+declare module "express-serve-static-core" {
+  interface Request {
+    links: LinkObject[];
+    stats: StatsObject[];
+    nopath: string;
+  }
+};
 
 const app: Express = express();
 export const port: string | undefined = process.env.PORT;
 export const host: string | undefined = process.env.HOST;
-
-let res404: string;
 
 app.use(cors());
 
@@ -42,11 +53,33 @@ export const writeToUrlData = async (payload:any): Promise<void> => {
   await fs.writeFile("./data/url-data.json", JSON.stringify(payload))
 };
 
-app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> =>{
+app.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
   try{
-    res404 = `Path "${req.url}" not found for method "${req.method}"`
+    let nomatch: boolean = true;
+    req.nopath = `Path "${req.url}" not found for method "${req.method}"`
+    req.stats = [];
     const urlData: string = await fs.readFile("./data/url-data.json", "utf8");
-    linksArray = JSON.parse(urlData);
+    req.links = JSON.parse(urlData);
+    req.links.forEach((item):void => {
+      for (let obj of req.stats){
+          if (obj.site === item.target){
+              nomatch = false;
+              obj.clicks += item.visits;
+              typeof obj.redirects !== "undefined" ? obj.redirects++ : obj.redirects = 1;
+              if (obj.last_visit_ms < item.last_visit_ms){
+                  obj.last_visit = item.last_visit;
+                  obj.last_visit_ms = item.last_visit_ms;    
+              }
+          }
+      }
+      nomatch ? req.stats.push({
+          site: item.target,
+          clicks: item.visits,
+          redirects: 1,
+          last_visit: item.last_visit,
+          last_visit_ms: item.last_visit_ms
+      }) : null
+  });
     next();
   } catch (err){
     next(err)
@@ -59,20 +92,20 @@ app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    let chosenLinkObj: UrlObject[] = linksArray.filter(item => item.shrinked === req.params.shrinked);
+    let chosenLinkObj: LinkObject[] = req.links.filter(item => item.shrinked === req.params.shrinked);
     if (chosenLinkObj.length){
-      linksArray.forEach((item, i): void => {
+      req.links.forEach((item, i): void => {
         if (item.shrinked === req.params.shrinked){
           item.visits++;
           item.last_visit = new Date(Date.now()).toString();
           item.last_visit_ms = Date.now()
         }
-        linksArray.splice(i,1,item);
+        req.links.splice(i,1,item);
       })
-      await writeToUrlData(linksArray);
+      await writeToUrlData(req.links);
       res.redirect(chosenLinkObj[0].target)
     } else {
-      res.status(404).send(res404)
+      res.status(404).send(req.nopath)
     }
   }catch (err){
     next(err)
@@ -85,8 +118,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void =>{
   res.status(500).json(err.message)
 });
 
-app.use("*", (_, res: Response): void =>{
-  res.status(404).send(res404)
+app.use("*", (req: Request, res: Response): void =>{
+  res.status(404).send(req.nopath)
 });
 
 app.listen( {port, host}, () : void => {
