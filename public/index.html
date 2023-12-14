@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Honey, I Shrunk The Links [TEST]</title>
 </head>
-<body>
+<body onload="{getStats()}">
     <div id="input">
         <form action="">
             <input type="text" id="target-link-input" placeholder="Target URL">
@@ -27,6 +27,21 @@
         <button type="button" onclick="{closeEditor()}">Close</button>
     </form>
     <button type="button" onclick="{resetData()}">Reset</button>
+    <div id="analytics">
+        <h2>Top Redirected Sites:</h2>
+        <div id="most-redirected"></div>
+        <h2>Top Visited Sites:</h2>
+        <div id="most-visited"></div>
+        <h2>Latest Visits:</h2>
+        <div id="last-visited"></div>
+        <h2>Get your site analytics</h2>
+        <p>Paste your shrinked URL to receive data</p>
+        <form action="">
+            <input type="text" id="shrink-link-input" placeholder="Shrinked URL">
+            <button type="button" onclick="{getShrinkedData()}">Submit</button>
+        </form>
+        <div id="full-site-stats"></div>
+    </div>
 <script>
     let id;
 
@@ -68,6 +83,8 @@
         catch (err) {
             document.querySelector("#output").innerHTML = `<span style="color: red">${err.message}</span>`;
             document.querySelector("#edit-button").classList.add("hidden");
+        } finally{
+            getStats()
         }
     };
 
@@ -90,8 +107,10 @@
             document.querySelector("#output").innerHTML = `<span style="color: red">${data}</span>`
         }catch (err) {
             document.querySelector("#output").innerHTML = `<span style="color: red">${err.message}</span>`;
+        }finally{
+            getStats()
         }
-    }
+    };
 
     async function resetData(){
         try{
@@ -104,8 +123,91 @@
             alert("data reset");
         }catch (err) {
             alert(err.message);
+        }finally{
+            getStats()
         }
-    }
+    };
+
+    function getStats(){
+        getAnalytics("most-redirected", "Shrinks");
+        getAnalytics("most-visited", "Visits");
+        getAnalytics("last-visited", "Visited");
+    };
+
+    async function getAnalytics(query, th_title){
+        try{
+            const url = `http://localhost:3020/api/analytics/${query}/3`;
+            const options = {
+            method: 'GET' 
+            };
+            const res = await fetch(url,options)
+            const data = await res.json();
+            document.querySelector(`#${query}`).innerHTML = `
+            <table style="border-collapse:collapse; border: 1px solid black">
+                <thead>
+                    <tr align="left">
+                        <th style="border-collapse:collapse; border: 1px solid black">Site</th>
+                        <th style="border-collapse:collapse; border: 1px solid black">${th_title}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border-collapse:collapse; border: 1px solid black">${data[0].site}</td>
+                        <td align="center" style="border-collapse:collapse; border: 1px solid black">${data[0].visit_date? data[0].visit_date : data[0].counter}</td>
+                    </tr>
+                    <tr>
+                        <td style="border-collapse:collapse; border: 1px solid black">${data[1].site}</td>
+                        <td align="center" style="border-collapse:collapse; border: 1px solid black">${data[1].visit_date? data[1].visit_date : data[1].counter}</td>
+                    </tr>
+                    <tr>
+                        <td style="border-collapse:collapse; border: 1px solid black">${data[2].site}</td>
+                        <td align="center" style="border-collapse:collapse; border: 1px solid black">${data[2].visit_date? data[2].visit_date : data[2].counter}</td>
+                    </tr>
+                </tbody>
+            </table>
+            `
+        } catch (err) {
+            document.querySelector(`#${query}`).innerHTML = `<span style="color: red">${err.message}</span>`;
+        }
+    };
+    
+    async function getShrinkedData(){
+        try{
+            const target = document.querySelector("#shrink-link-input").value.replaceAll("http://localhost:3020/","");
+            const url = `http://localhost:3020/api/analytics/${target}`;
+            const options = {
+            method: 'GET' 
+            };
+            const res = await fetch(url,options)
+            const data = await res.json();
+            document.querySelector("#full-site-stats").innerHTML = `
+            <table style="border-collapse:collapse; border: 1px solid black">
+                <thead>
+                    <tr align="left">
+                        <th style="border-collapse:collapse; border: 1px solid black">Shrinked</th>
+                        <th style="border-collapse:collapse; border: 1px solid black"><a href=${data.shrinked} target="_blank">${data.shrinked}</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border-collapse:collapse; border: 1px solid black">Target</td>
+                        <td style="border-collapse:collapse; border: 1px solid black">${data.target}</td>
+                    </tr>
+                    <tr>
+                        <td style="border-collapse:collapse; border: 1px solid black">Clicks</td>
+                        <td style="border-collapse:collapse; border: 1px solid black">${data.visits}</td>
+                    </tr>
+                    <tr>
+                        <td style="border-collapse:collapse; border: 1px solid black">Last Visited</td>
+                        <td style="border-collapse:collapse; border: 1px solid black">${data.last_visit}</td>
+                    </tr>
+                </tbody>
+            </table>
+            `
+        } catch (err) {
+            document.querySelector(`#full-site-stats`).innerHTML = `<span style="color: red">${err.message}</span>`;
+        }
+    };
 </script>
 </body>
 </html>
