@@ -1,7 +1,7 @@
 import { Router, NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 
-import { LinkObject, writeToUrlData } from "../index";
+import { LinkObject, writeToUrlData, host, port } from "../index";
 
 const router = Router();
 
@@ -22,7 +22,7 @@ const createNewShrinked = async (req: Request, res: Response, next: NextFunction
     }
     req.links.push(newLinkObj);
     await writeToUrlData(req.links);
-    res.json(newLinkObj)
+    res.json({...newLinkObj, shrinked: `http://${host}:${port}/${randomHash}`}  )
   } catch (err) {
     next(err)
   }

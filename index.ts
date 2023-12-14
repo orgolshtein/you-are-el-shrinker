@@ -31,7 +31,8 @@ declare module "express-serve-static-core" {
   interface Request {
     links: LinkObject[];
     stats: StatsObject[];
-    nopath: string;
+    nopatherr: string;
+    nomatch: boolean;
   }
 };
 
@@ -55,15 +56,15 @@ export const writeToUrlData = async (payload:any): Promise<void> => {
 
 app.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
   try{
-    let nomatch: boolean = true;
-    req.nopath = `Path "${req.url}" not found for method "${req.method}"`
+    req.nomatch = true;
+    req.nopatherr = `Path "${req.url}" not found for method "${req.method}"`
     req.stats = [];
     const urlData: string = await fs.readFile("./data/url-data.json", "utf8");
     req.links = JSON.parse(urlData);
-    req.links.forEach((item):void => {
+    req.links.forEach((item): void => {
       for (let obj of req.stats){
           if (obj.site === item.target){
-              nomatch = false;
+              req.nomatch = false;
               obj.clicks += item.visits;
               typeof obj.redirects !== "undefined" ? obj.redirects++ : obj.redirects = 1;
               if (obj.last_visit_ms < item.last_visit_ms){
@@ -72,7 +73,7 @@ app.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
               }
           }
       }
-      nomatch ? req.stats.push({
+      req.nomatch ? req.stats.push({
           site: item.target,
           clicks: item.visits,
           redirects: 1,
@@ -92,7 +93,7 @@ app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    let chosenLinkObj: LinkObject[] = req.links.filter(item => item.shrinked === req.params.shrinked);
+    let chosenLinkObj: LinkObject[] = req.links.filter((item): boolean => item.shrinked === req.params.shrinked);
     if (chosenLinkObj.length){
       req.links.forEach((item, i): void => {
         if (item.shrinked === req.params.shrinked){
@@ -105,7 +106,7 @@ app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): P
       await writeToUrlData(req.links);
       res.redirect(chosenLinkObj[0].target)
     } else {
-      res.status(404).send(req.nopath)
+      res.status(404).send(req.nopatherr)
     }
   }catch (err){
     next(err)
@@ -119,9 +120,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void =>{
 });
 
 app.use("*", (req: Request, res: Response): void =>{
-  res.status(404).send(req.nopath)
+  res.status(404).send(req.nopatherr)
 });
 
-app.listen( {port, host}, () : void => {
+app.listen( {port, host}, (): void => {
   console.log(`Server is running at http://${host}:${port}`);
 });

@@ -11,138 +11,56 @@ router.use(bodyParser.json());
 
 interface CountObject {
     site: string;
-    counter: number;
+    counter: string | number;
     visit_date?: string;
 };
 
-// interface FrequencyObject {
-//     [key: string]: number;
-// };
+const getAllStats = (stats: StatsObject[], prop: keyof StatsObject, date_needed: boolean): CountObject[] => {
+    stats.sort((a: StatsObject, b: StatsObject): number => 
+    a[prop] < b[prop] ? -1 : b[prop] > a[prop] ? 1 : 0).reverse();
+    let countArr: CountObject[] = [];
+    stats.forEach((item): number => 
+    date_needed ? countArr.push({site: item.site, counter: item[prop], visit_date: item.last_visit}) : 
+    countArr.push({site: item.site, counter: item[prop]}));
+    return countArr;
+};
 
-// const descending = (arr: LinkObject[], param: number): LinkObject[] =>
-//     arr.sort((a, b): number => a.param - b.param).reverse();
-
-// const getTopSites = (links: LinkObject[]): CountObject[] => {
-//     let sites: string[] = [];
-//     let siteFrequency: FrequencyObject = {};
-//     links.forEach((item): void =>{
-//         if (sites.includes(item.target.replace("https://", ""))) {
-//             siteFrequency[item.target.replace("https://", "")]++
-//         } else{
-//             sites.push(item.target.replace("https://", "")); 
-//             siteFrequency[item.target.replace("https://", "")] = 1;
-//         }
-//     });
-//     return descending(Object.keys(siteFrequency)
-//     .map((item): CountObject => ({name: item, counter: siteFrequency[item]})));
-// };
-
-// const getTopShrinked = (links:LinkObject[]): CountObject[] => {
-//     let shrinks: CountObject[] = []
-//     return descending(links.map((item, i): CountObject => shrinks[i] = {
-//         name: item.shrinked, 
-//         counter: item.visits
-//     }));
-// };
-
-// const getLastVisited = (links:LinkObject[]): CountObject[] => {
-//     let siteVisits: CountObject[] = []
-//     return descending(links.map((item, i): CountObject => siteVisits[i] = {
-//         name: item.shrinked, 
-//         counter: item.last_visit_ms, 
-//         visit_date: item.last_visit
-//     }));
-// };
-
-// const filterCount = (fn: (links: StatsObject[]) => CountObject[], links: StatsObject[], param: string): CountObject[] => 
-// fn(links).filter((item,i): CountObject | null => i<Number(param)? item : null);
-
-// router.use((req: Request, _, next: NextFunction): void => {
-//     let nomatch: boolean = true;
-//     req.links.forEach((item):void => {
-//         for (let obj of req.stats){
-//             if (obj.site === item.target){
-//                 nomatch = false;
-//                 obj.clicks += item.visits;
-//                 typeof obj.redirects !== "undefined" ? obj.redirects++ : obj.redirects = 1;
-//                 if (obj.last_visit_ms < item.last_visit_ms){
-//                     obj.last_visit = item.last_visit;
-//                     obj.last_visit_ms = item.last_visit_ms;    
-//                 }
-//             }
-//         }
-//         nomatch ? req.stats.push({
-//             site: item.target,
-//             clicks: item.visits,
-//             redirects: 1,
-//             last_visit: item.last_visit,
-//             last_visit_ms: item.last_visit_ms
-//         }) : null
-//     });
-//     next();
-// });
+const getTopStats = (stats: StatsObject[], prop: keyof StatsObject, param: string, date_needed: boolean): CountObject[] => 
+getAllStats(stats, prop, date_needed).filter((item,i): CountObject | null => i<Number(param)? item : null);
 
 router.get("/most-redirected/", (req: Request, res: Response): void => {
-    req.stats.sort((a: StatsObject, b: StatsObject): number => a.redirects - b.redirects).reverse();
-    let mostRedirectedAll: CountObject[] = [];
-    req.stats.forEach((item) => mostRedirectedAll.push({site: item.site, counter: item.redirects}));
-    res.status(200).json(mostRedirectedAll);
+    res.status(200).json(getAllStats(req.stats, "redirects", false));
 });
 
 router.get("/most-redirected/:count", (req: Request, res: Response): void => {
-    req.stats.sort((a: StatsObject, b: StatsObject): number => a.redirects - b.redirects).reverse();
-    let mostRedirectedAll: CountObject[] = [];
-    req.stats.forEach((item) => mostRedirectedAll.push({site: item.site, counter: item.redirects}));
-    let mostRedirected = mostRedirectedAll.filter((item,i): CountObject | null => 
-    i<Number(req.params.count)? item : null)
-    res.status(200).json(mostRedirected);
+    res.status(200).json(getTopStats(req.stats, "redirects", req.params.count, false));
 });
 
 router.get("/most-visited", (req: Request, res: Response): void => {
-    req.stats.sort((a: StatsObject, b: StatsObject): number => a.clicks - b.clicks).reverse();
-    let mostVisitedAll: CountObject[] = [];
-    req.stats.forEach((item) => mostVisitedAll.push({site: item.site, counter: item.clicks}));
-    res.status(200).json(mostVisitedAll);
+    res.status(200).json(getAllStats(req.stats, "clicks", false));
 });
 
 router.get("/most-visited/:count", (req: Request, res: Response): void => {
-    req.stats.sort((a: StatsObject, b: StatsObject): number => a.clicks - b.clicks).reverse();
-    let mostVisitedAll: CountObject[] = [];
-    req.stats.forEach((item) => mostVisitedAll.push({site: item.site, counter: item.clicks}));
-    let mostVisited = mostVisitedAll.filter((item,i): CountObject | null => 
-    i<Number(req.params.count)? item : null)
-    res.status(200).json(mostVisited);
+    res.status(200).json(getTopStats(req.stats, "clicks", req.params.count, false));
 });
 
 router.get("/last-visited", (req: Request, res: Response): void => {
-    req.stats.sort((a: StatsObject, b: StatsObject): number => a.last_visit_ms - b.last_visit_ms).reverse();
-    let lastVisitedAll: CountObject[] = [];
-    req.stats.forEach((item) => lastVisitedAll.push({site: item.site, counter: item.last_visit_ms, visit_date: item.last_visit}));
-    res.status(200).json(lastVisitedAll);
+    res.status(200).json(getAllStats(req.stats, "last_visit_ms", true));
 });
 
 router.get("/last-visited/:count", (req: Request, res: Response): void => {
-    req.stats.sort((a: StatsObject, b: StatsObject): number => a.last_visit_ms - b.last_visit_ms).reverse();
-    let lastVisitedAll: CountObject[] = [];
-    req.stats.forEach((item) => lastVisitedAll.push({site: item.site, counter: item.last_visit_ms, visit_date: item.last_visit}));
-    let lastVisited = lastVisitedAll.filter((item,i): CountObject | null => 
-    i<Number(req.params.count)? item : null)
-    res.status(200).json(lastVisited);
+    res.status(200).json(getTopStats(req.stats, "last_visit_ms", req.params.count, true));
 });
 
 router.get("/:shrinked", (req: Request, res: Response): void => {
+    req.nomatch = true;
     req.links.forEach((item): void => {
-        if (item.shrinked === req.params.shrinked){
-            res.status(200).json(
-                {
-                    target: item.target,
-                    shrinked: `http://${host}:${port}/${item.shrinked}`,
-                    clicks: item.visits,
-                    last_visit: item.last_visit
-                }
-            )
+        if (item.shrinked === req.params.shrinked) {
+            req.nomatch = false;
+            res.status(200).json({...item, shrinked: `http://${host}:${port}/${item.shrinked}`});
         }
     })
+    req.nomatch ? res.status(404).send(req.nopatherr) : null
 });
 
 export default router;

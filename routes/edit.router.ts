@@ -11,23 +11,32 @@ router.use(bodyParser.json());
 
 router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
+      let path_in_use: boolean = false;
+      req.nomatch = true;
       let chosenLinkObj: LinkObject = {id:-1, target:"", shrinked:"", visits: 0, last_visit: "None", last_visit_ms: 0};
       let patchedLinkObj: LinkObject = {id:-1, target:"", shrinked:"", visits: 0, last_visit: "None", last_visit_ms: 0};
       req.links.forEach((item, i): void => {
         if (item.shrinked === req.body.shrinked){
-          let err: Error = new Error("Path already in use");
-          next(err)
+          path_in_use = true;
         } else{
           if (item.id?.toString() === req.params.id) {
+            req.nomatch = false;
             chosenLinkObj = item;
             patchedLinkObj = {...chosenLinkObj, shrinked: req.body.shrinked};
             req.links.splice(i,1,patchedLinkObj);
           }
         }
       })
-      if (patchedLinkObj.id !== -1) {
-        await writeToUrlData(req.links)
-        res.status(200).json({...patchedLinkObj, updated:`http://${host}:${port}/${req.body.shrinked}`})
+      if (path_in_use) {
+        let err: Error = new Error("Path already in use");
+        next(err);
+      } else{
+        if (req.nomatch) {
+          res.status(404).send(req.nopatherr);
+        } else {
+          await writeToUrlData(req.links)
+          res.status(200).json({...patchedLinkObj, shrinked:`http://${host}:${port}/${req.body.shrinked}`})
+        }
       }
     } catch (err){
       next(err)
@@ -41,9 +50,9 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Pr
           id: 1,
           target: "https://unagibet.onrender.com",
           shrinked: "unagi",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 3,
+          last_visit: "Thu Dec 14 2023 11:04:17 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544657778
         },
         {
           id: 2,
@@ -57,73 +66,73 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Pr
           id: 3,
           target: "https://id-validator-reactjs.onrender.com",
           shrinked: "id-val2",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 2,
+          last_visit: "Thu Dec 14 2023 10:53:57 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544037242
         },
         {
           id: 4,
           target: "https://orgolshtein.wixsite.com/portfolio",
           shrinked: "orgo",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 5,
+          last_visit: "Thu Dec 14 2023 11:04:01 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544641663
         },
         {
           id: 5,
           target: "https://www.facebook.com",
           shrinked: "fb",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 2,
+          last_visit: "Thu Dec 14 2023 11:04:50 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544690656
         },
         {
           id: 6,
           target: "https://www.google.com",
           shrinked: "gl",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 4,
+          last_visit: "Thu Dec 14 2023 11:04:47 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544687221
         },
         {
           id: 7,
           target: "https://www.youtube.com",
           shrinked: "yt",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 3,
+          last_visit: "Thu Dec 14 2023 11:04:26 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544666147
         },
         {
           id: 8,
           target: "https://www.linkedin.com",
           shrinked: "lin",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 1,
+          last_visit: "Thu Dec 14 2023 10:54:24 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544064976
         },
         {
           id: 9,
           target: "https://unagibet.onrender.com",
           shrinked: "unagibet",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 6,
+          last_visit: "Thu Dec 14 2023 11:04:08 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544648423
         },
         {
           id: 10,
           target: "https://id-validator-reactjs.onrender.com",
           shrinked: "id-reactjs",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 2,
+          last_visit: "Thu Dec 14 2023 10:56:47 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544207176
         },
         {
           id: 11,
           target: "https://unagibet.onrender.com",
           shrinked: "ubt",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 2,
+          last_visit: "Thu Dec 14 2023 10:55:33 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544133226
         },
         {
           id: 12,
@@ -145,9 +154,9 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Pr
           id: 14,
           target: "https://www.facebook.com",
           shrinked: "fbook",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 3,
+          last_visit: "Thu Dec 14 2023 11:04:30 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544670689
         },
         {
           id: 15,
@@ -169,9 +178,9 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Pr
           id: 17,
           target: "https://unagibet.onrender.com",
           shrinked: "ubet",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 1,
+          last_visit: "Thu Dec 14 2023 10:55:05 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544105148
         },
         {
           id: 18,
@@ -193,9 +202,9 @@ router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Pr
           id: 20,
           target: "https://orgolshtein.wixsite.com/portfolio",
           shrinked: "org",
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
+          visits: 2,
+          last_visit: "Thu Dec 14 2023 11:04:55 GMT+0200 (Israel Standard Time)",
+          last_visit_ms: 1702544695439
         }
       ]
       await writeToUrlData(linksResetArray);
