@@ -1,7 +1,7 @@
 import { Router, NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 
-import { LinkObject, writeToUrlData, host, port } from "../index";
+import * as create_controller from "../controllers/create.controller";
 
 const router = Router();
 
@@ -11,18 +11,8 @@ router.use(bodyParser.json());
 
 const createNewShrinked = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    let randomHash: string = (Math.random() + 1).toString(36).substring(5);
-    let newLinkObj: LinkObject = {
-      id: req.links.length+1, 
-      target: req.params[0] ? `https://${req.params.target}/${req.params[0]}` : `https://${req.params.target}`, 
-      shrinked: randomHash,
-      visits: 0,
-      last_visit: "None",
-      last_visit_ms: 0
-    }
-    req.links.push(newLinkObj);
-    await writeToUrlData(req.links);
-    res.json({...newLinkObj, shrinked: `http://${host}:${port}/${randomHash}`}  )
+    const newShrinked = await create_controller.createShrinked(req.params.target, req.params[0])
+    res.json(newShrinked)
   } catch (err) {
     next(err)
   }

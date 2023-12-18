@@ -52,15 +52,15 @@ router.get("/last-visited/:count", (req: Request, res: Response): void => {
     res.status(200).json(getTopStats(req.stats, "last_visit_ms", req.params.count, true));
 });
 
-router.get("/:shrinked", (req: Request, res: Response): void => {
-    req.nomatch = true;
-    req.links.forEach((item): void => {
-        if (item.shrinked === req.params.shrinked) {
-            req.nomatch = false;
-            res.status(200).json({...item, shrinked: `http://${host}:${port}/${item.shrinked}`});
-        }
-    })
-    req.nomatch ? res.status(404).send(req.nopatherr) : null
-});
+// router.get("/:shrinked", (req: Request, res: Response): void => {
+//     req.nomatch = true;
+//     req.links.forEach((item): void => {
+//         if (item.shrinked === req.params.shrinked) {
+//             req.nomatch = false;
+//             res.status(200).json({...item, shrinked: `http://${host}:${port}/${item.shrinked}`});
+//         }
+//     })
+//     req.nomatch ? res.status(404).send(req.nopatherr) : null
+// });
 
 export default router;
