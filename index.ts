@@ -78,7 +78,7 @@ app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    let target: string | undefined = await links_controller.useLink(req.params.shrinked);
+    const target: string | undefined = await links_controller.useLink(req.params.shrinked);
     target !== undefined ? res.redirect(target): res.status(404).send(req.no_path_err)
   }catch (err){
     next(err)

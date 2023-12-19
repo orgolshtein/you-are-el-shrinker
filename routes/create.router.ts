@@ -9,22 +9,22 @@ router.use(bodyParser.urlencoded({ extended: false }));
 
 router.use(bodyParser.json());
 
-const createNewShrinked = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const createLink = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    const newShrinked = await create_controller.createShrinked(req.params.target, req.params[0])
-    res.json(newShrinked)
+    const newLink = await create_controller.createLink(req.params.target, req.params[0])
+    res.json(newLink)
   } catch (err) {
     next(err)
   }
 };
 
 router.post("/", (req: Request, res: Response, next: NextFunction): void => {
-  let err: Error = new Error("No input");
+  const err: Error = new Error("No input");
   next(err)
 })
 
-router.post("/:target", createNewShrinked);
+router.post("/:target", createLink);
   
-router.post("/:target/*", createNewShrinked);
+router.post("/:target/*", createLink);
 
 export default router;

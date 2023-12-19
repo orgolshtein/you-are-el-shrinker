@@ -4,37 +4,31 @@ import * as create_model from "../models/create.model";
 import * as link_model from "../models/links.model";
 import { LinkObject, RedirectObject } from "../index";
 
-export const createShrinked = async (target: string, param: string): Promise<any> => {
+export const createLink = async (target: string, param: string): Promise<LinkObject | undefined> => {
     try{
-      let randomHash: string = (Math.random() + 1).toString(36).substring(5);
-      let chosenLinkObj: LinkObject | undefined = await create_model.getOneLink(target, param);
-      if (chosenLinkObj === undefined){
+      const randomHash: string = (Math.random() + 1).toString(36).substring(5);
+      const linkObj: LinkObject | undefined = await create_model.getLinkByTarget(target, param);
+      const newRedirectObj: RedirectObject = {
+        _id: new ObjectId,
+        link: randomHash,
+        visits: 0,
+        last_visit: "None",
+        last_visit_ms: 0
+      };
+      if (linkObj === undefined){
         let newLinkObj: LinkObject = {
           _id: new ObjectId,
           target: param ? `https://${target}/${param}` : `https://${target}`, 
-          shrinks: [{
-            _id: new ObjectId,
-            link: randomHash,
-            visits: 0,
-            last_visit: "None",
-            last_visit_ms: 0
-          }]
+          shrinks: [{...newRedirectObj}]
         }
-        await create_model.createShrinked(newLinkObj);
+        await create_model.createLink(newLinkObj);
         return {...newLinkObj}
       } else {
-        let newShrinkedObj: RedirectObject = {
-          _id: new ObjectId,
-          link: randomHash,
-          visits: 0,
-          last_visit: "None",
-          last_visit_ms: 0
-        };
-        chosenLinkObj.shrinks.push(newShrinkedObj);
-        await link_model.updateOne(chosenLinkObj);
-        return {...chosenLinkObj}
+        linkObj.shrinks.push(newRedirectObj);
+        await link_model.updateOne(linkObj);
+        return {...linkObj}
         }
       } catch (err) {
-        return err
+        console.log(err)
       }
 };

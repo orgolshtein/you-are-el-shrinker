@@ -1,17 +1,23 @@
 import { LinkObject } from "../index";
 import { db } from "../db/mongo.connect";
 
-export const getOneLink = async (target: string, param?: string): Promise<LinkObject> => {
-    const links: any = await db.collection("links");
-    let chosenLinkArr: LinkObject[];
-    param ? 
-        chosenLinkArr = await links.find({ target: `https://${target}/${param}`}).toArray() :
-        chosenLinkArr = await links.find({ target: `https://${target}`}).toArray()
-    const chosenLinkObj: LinkObject = chosenLinkArr[0]
-    console.log(chosenLinkObj)
-    return chosenLinkObj;
+export const getLinkByTarget = async (target: string, param?: string): Promise<LinkObject | undefined> => {
+    try{
+        const links: any = await db.collection("links");
+        let linkArr: LinkObject[];
+        param ? 
+            linkArr = await links.find({ target: `https://${target}/${param}`}).toArray() :
+            linkArr = await links.find({ target: `https://${target}`}).toArray()
+        return linkArr[0];
+    } catch (err) {
+        console.log(err)
+    }
 };
 
-export const createShrinked = async (link: LinkObject): Promise<any> => {
-    return await db.collection("links").insertOne(link);
+export const createLink = async (link: LinkObject): Promise<void> => {
+    try{
+        return await db.collection("links").insertOne(link);
+    } catch (err) {
+        console.log(err)
+    }
 };
