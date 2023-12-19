@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import bodyParser  from "body-parser";
-import fs from "fs/promises";
 import { ObjectId } from "mongodb";
 
 import { mongoConnect } from "./db/mongo.connect";
@@ -39,7 +38,7 @@ declare module "express-serve-static-core" {
   interface Request {
     links: LinkObject[];
     stats: StatsObject[];
-    no_path_err: string | unknown;
+    no_path_err: string;
     no_match: boolean;
     path_in_use: boolean;
   }
@@ -62,12 +61,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use((req: Request, _, next: NextFunction): void =>{
-  try{
-    req.no_path_err = links_controller.addRequestProps(req.url, req.method);
+    links_controller.addRequestProps(
+      req.links, 
+      req.no_path_err, 
+      req.url, 
+      req.method,
+      req.no_match,
+      req.path_in_use
+      );
     next();
-  } catch (err){
-    next(err)
-  }
 });
 
 app.use("/api/create", createRouter);
@@ -76,9 +78,8 @@ app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    let targetUrl: string | unknown = await links_controller.useLink(req.params.shrinked);
-    console.log(targetUrl);
-    typeof targetUrl === "string" ? res.redirect(targetUrl): res.status(404).send(req.no_path_err)
+    let target: string | undefined = await links_controller.useLink(req.params.shrinked);
+    target !== undefined ? res.redirect(target): res.status(404).send(req.no_path_err)
   }catch (err){
     next(err)
   }
