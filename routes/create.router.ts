@@ -2,7 +2,7 @@ import { Router, NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 
 import * as create_controller from "../controllers/create.controller";
-import { LinkObject } from "..";
+import { LinkObject, RedirectObject } from "..";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.use(bodyParser.json());
 
 const createLink = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    const newLink: LinkObject | undefined  = await create_controller.createLink(req.params.target, req.params[0])
+    const newLink: RedirectObject | undefined  = await create_controller.createLink(req.params.target, req.params[0])
     newLink !== undefined ? res.status(200).json(newLink): res.status(404).send(req.no_path_err);
   } catch (err) {
     next(err)

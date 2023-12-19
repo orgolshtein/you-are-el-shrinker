@@ -10,10 +10,14 @@ router.use(bodyParser.urlencoded({ extended: false }));
 
 router.use(bodyParser.json());
 
-router.patch("/:link", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.patch("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
-      const linkObj: LinkObject | undefined = await edit_controller.editLink(req.params.link, req.body.new_link);
-      linkObj !== undefined ? res.status(200).json(linkObj): res.status(404).send(req.no_path_err)
+      const linkObj: LinkObject | boolean | undefined = await edit_controller.editLink(req.params.id, req.body.new_link);
+      linkObj === false ?
+      res.status(500).send("Path is already in use") :
+      linkObj !== undefined ? 
+      res.status(200).json(linkObj): 
+      res.status(404).send(req.no_path_err)
     } catch (err){
       next(err)
     }

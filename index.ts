@@ -17,7 +17,7 @@ export interface LinkObject {
   _id: ObjectId;
   target: string;
   shrinks: RedirectObject[];
-  output?: string
+  output?: string;
 }
 
 export interface RedirectObject {
@@ -26,6 +26,7 @@ export interface RedirectObject {
   visits: number;
   last_visit: string;
   last_visit_ms: number;
+  output?: string;
 }
 
 export interface StatsObject {
