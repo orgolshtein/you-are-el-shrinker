@@ -17,6 +17,7 @@ export interface LinkObject {
   _id: ObjectId;
   target: string;
   shrinks: RedirectObject[];
+  output?: string
 }
 
 export interface RedirectObject {
@@ -36,7 +37,7 @@ export interface StatsObject {
 }
 declare module "express-serve-static-core" {
   interface Request {
-    links: LinkObject[];
+    links: LinkObject[] | undefined;
     stats: StatsObject[];
     no_path_err: string;
     no_match: boolean;
@@ -60,16 +61,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-app.use((req: Request, _, next: NextFunction): void =>{
-    links_controller.addRequestProps(
-      req.links, 
-      req.no_path_err, 
-      req.url, 
-      req.method,
-      req.no_match,
-      req.path_in_use
-      );
+app.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
+  try{
+    req.links = await links_controller.getAllLinks();
+    req.no_path_err = `Path "${req.url}" not found for method "${req.method}"`;
+    req.no_match = true;
+    req.path_in_use = false;
     next();
+  }catch (err) {
+    next(err)
+  }
 });
 
 app.use("/api/create", createRouter);

@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import * as create_model from "../models/create.model";
 import * as link_model from "../models/links.model";
-import { LinkObject, RedirectObject } from "../index";
+import { LinkObject, RedirectObject, port, host } from "../index";
 
 export const createLink = async (target: string, param: string): Promise<LinkObject | undefined> => {
     try{
@@ -22,11 +22,11 @@ export const createLink = async (target: string, param: string): Promise<LinkObj
           shrinks: [{...newRedirectObj}]
         }
         await create_model.createLink(newLinkObj);
-        return {...newLinkObj}
+        return {...newLinkObj, output: `http://${host}:${port}/${randomHash}`}
       } else {
         linkObj.shrinks.push(newRedirectObj);
-        await link_model.updateOne(linkObj);
-        return {...linkObj}
+        await link_model.updateLink(linkObj);
+        return {...linkObj, output: `http://${host}:${port}/${randomHash}`}
         }
       } catch (err) {
         console.log(err)

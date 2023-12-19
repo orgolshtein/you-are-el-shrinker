@@ -10,11 +10,12 @@ router.use(bodyParser.urlencoded({ extended: false }));
 
 router.use(bodyParser.json());
 
-router.patch("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.patch("/:link", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try{
-      
+      const linkObj: LinkObject | undefined = await edit_controller.editLink(req.params.link, req.body.new_link);
+      linkObj !== undefined ? res.status(200).json(linkObj): res.status(404).send(req.no_path_err)
     } catch (err){
-      
+      next(err)
     }
   });
   

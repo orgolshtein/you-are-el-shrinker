@@ -1,22 +1,12 @@
 import * as link_model from "../models/links.model";
 import { LinkObject } from "../index";
 
-export const addRequestProps = async (
-    links: LinkObject[] | undefined,
-    no_path_err: string,
-    url: string, 
-    method: string,
-    no_match: boolean,
-    path_in_use: boolean
-    ): Promise<void> => {
-        try{
-            links = await link_model.getAllLinks();
-            no_path_err = `Path "${url}" not found for method "${method}"`;
-            no_match = true,
-            path_in_use = false
-        } catch (err){
-            console.log(err);
-        }
+export const getAllLinks = async (): Promise<LinkObject[] | undefined> => {
+    try{
+        return await link_model.getAllLinks();
+    } catch (err){
+        console.log(err);
+    }
 };
 
 export const useLink = async (param: string): Promise<string | undefined> => {
@@ -34,7 +24,7 @@ export const useLink = async (param: string): Promise<string | undefined> => {
                     });
                 }
             })
-            await link_model.updateOne(linkObj)
+            await link_model.updateLink(linkObj)
             return linkObj.target
         }
     } catch (err){

@@ -18,7 +18,7 @@ export const getLinkbyRedirect = async (param: string): Promise<LinkObject | und
     }
 };
 
-export const updateOne = async (obj: LinkObject) => {
+export const updateLink = async (obj: LinkObject) => {
     try{
         return await db.collection("links").replaceOne({ _id: obj._id }, { ...obj });
     }catch (err) {
