@@ -1,11 +1,20 @@
 import * as edit_model from "../models/edit.model";
 import * as link_model from "../models/links.model";
-import { LinkObject, host, port } from "../index";
+import { LinkObject, RedirectObject, host, port } from "../index";
+import { ObjectId } from "mongodb";
 
-export const editLink = async (id: string, new_link: string): Promise<LinkObject | boolean | undefined> => {
+export const editLink = async (id: string, new_link: string): Promise<RedirectObject | boolean | undefined> => {
   try{
     const matchObj: LinkObject | undefined = await link_model.getLinkbyRedirect(new_link); 
     const linkObj: LinkObject | undefined = await edit_model.getLinkbyId(id);
+    let redirectObj: RedirectObject = {
+        _id: new ObjectId,
+        link: "",
+        visits: 0,
+        last_visit: "",
+        last_visit_ms: 0,
+        output: ""
+    };
     if (matchObj !== undefined ){
         return false;
     } else {
@@ -17,13 +26,15 @@ export const editLink = async (id: string, new_link: string): Promise<LinkObject
                         link: new_link,
                         visits: item.visits,
                         last_visit: item.last_visit,
-                        last_visit_ms: item.last_visit_ms
+                        last_visit_ms: item.last_visit_ms,
+                        output: `http://${host}:${port}/${new_link}`
                     });
+                    redirectObj = linkObj.shrinks[i]
                 }
             })
             await link_model.updateLink(linkObj)
-            return {...linkObj, output: `http://${host}:${port}/${new_link}`};
-    }
+            return redirectObj
+        }
     }
 } catch (err){
     console.log(err);

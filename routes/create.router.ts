@@ -13,7 +13,7 @@ router.use(bodyParser.json());
 const createLink = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
     const newLink: RedirectObject | undefined  = await create_controller.createLink(req.params.target, req.params[0])
-    newLink !== undefined ? res.status(200).json(newLink): res.status(404).send(req.no_path_err);
+    newLink !== undefined ? res.status(200).json({_id: newLink._id, output: newLink.output}): res.status(404).send(req.no_path_err);
   } catch (err) {
     next(err)
   }

@@ -13,13 +13,6 @@ import * as links_controller from "./controllers/links.controller";
 
 dotenv.config();
 
-export interface LinkObject {
-  _id: ObjectId;
-  target: string;
-  shrinks: RedirectObject[];
-  output?: string;
-}
-
 export interface RedirectObject {
   _id: ObjectId;
   link: string;
@@ -27,22 +20,24 @@ export interface RedirectObject {
   last_visit: string;
   last_visit_ms: number;
   output?: string;
-}
+};
+
+export interface LinkObject {
+  _id: ObjectId;
+  target: string;
+  shrinks: RedirectObject[];
+};
 
 export interface StatsObject {
   site: string;
-  clicks: number;
-  redirects: number;
-  last_visit: string;
-  last_visit_ms: number;
-}
+  counter: string | number;
+  visit_date?: string;
+};
 declare module "express-serve-static-core" {
   interface Request {
     links: LinkObject[] | undefined;
-    stats: StatsObject[];
     no_path_err: string;
     no_match: boolean;
-    path_in_use: boolean;
   }
 };
 
@@ -62,16 +57,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-app.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
-  try{
-    req.links = await links_controller.getAllLinks();
+app.use((req: Request, _, next: NextFunction): void =>{
     req.no_path_err = `Path "${req.url}" not found for method "${req.method}"`;
-    req.no_match = true;
-    req.path_in_use = false;
     next();
-  }catch (err) {
-    next(err)
-  }
 });
 
 app.use("/api/create", createRouter);
