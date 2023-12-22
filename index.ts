@@ -29,9 +29,7 @@ export interface LinkObject {
 };
 
 export interface StatsObject {
-  site: string;
-  counter: string | number;
-  visit_date?: string;
+  [key: string]: string | number | ObjectId
 };
 declare module "express-serve-static-core" {
   interface Request {
