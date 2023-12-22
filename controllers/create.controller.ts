@@ -3,10 +3,10 @@ import { ObjectId } from "mongodb";
 import * as links_model from "../models/links.model";
 import { LinkObject, RedirectObject, port, host } from "../index";
 
-export const createLink = async (target: string, param: string): Promise<RedirectObject | undefined> => {
+export const createLink = async (target_value: string, param: string): Promise<RedirectObject | undefined> => {
     try{
       const randomHash: string = (Math.random() + 1).toString(36).substring(5);
-      const linkObj: LinkObject | undefined = await links_model.getLinkByTarget(target, param);
+      const linkObj: LinkObject | undefined = await links_model.getLink(target_value, "by_target", param);
       const newRedirectObj: RedirectObject = {
         _id: new ObjectId,
         link: randomHash,
@@ -17,7 +17,7 @@ export const createLink = async (target: string, param: string): Promise<Redirec
       if (linkObj === undefined){
         let newLinkObj: LinkObject = {
           _id: new ObjectId,
-          target: param ? `https://${target}/${param}` : `https://${target}`, 
+          target: param ? `https://${target_value}/${param}` : `https://${target_value}`, 
           shrinks: [{...newRedirectObj}]
         }
         await links_model.createLink(newLinkObj);

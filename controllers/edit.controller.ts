@@ -1,11 +1,12 @@
-import * as links_model from "../models/links.model";
-import { LinkObject, RedirectObject, host, port } from "../index";
 import { ObjectId } from "mongodb";
 
-export const editLink = async (id: string, new_link: string): Promise<RedirectObject | boolean | undefined> => {
+import * as links_model from "../models/links.model";
+import { LinkObject, RedirectObject, host, port } from "../index";
+
+export const editLink = async (redirect_id: string, new_redirect: string): Promise<RedirectObject | boolean | undefined> => {
   try{
-    const matchObj: LinkObject | undefined = await links_model.getLinkbyRedirect(new_link); 
-    const linkObj: LinkObject | undefined = await links_model.getLinkbyId(id);
+    const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect, null); 
+    const linkObj: LinkObject | undefined = await links_model.getLink(redirect_id, "by_id");
     let redirectObj: RedirectObject = {
         _id: new ObjectId,
         link: "",
@@ -18,28 +19,31 @@ export const editLink = async (id: string, new_link: string): Promise<RedirectOb
         return false;
     } else {
         if (linkObj !== undefined){
-            linkObj.shrinks.forEach((item, i): void => {
-                if (item._id.toString() === id){
+            linkObj.shrinks.forEach((item: RedirectObject, i: number): void => {
+                if (item._id.toString() === redirect_id){
                     linkObj.shrinks.splice(i, 1 ,{
                         _id: item._id,
-                        link: new_link,
+                        link: new_redirect,
                         visits: item.visits,
                         last_visit: item.last_visit,
                         last_visit_ms: item.last_visit_ms,
-                        output: `http://${host}:${port}/${new_link}`
+                        output: `http://${host}:${port}/${new_redirect}`
                     });
                     redirectObj = linkObj.shrinks[i]
                 }
             })
             await links_model.updateLink(linkObj)
             return redirectObj
-        }
+        }}
+    } catch (err){
+        console.log(err);
     }
-} catch (err){
-    console.log(err);
-}
 };
 
 export const deleteAllLinks = async (): Promise<any> => {
-  return await links_model.deleteAllLinks();
+    try{
+        return await links_model.deleteAllLinks();
+    } catch (err){
+        console.log(err);
+    }
 };

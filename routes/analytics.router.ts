@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
-import * as links_controller from "../controllers/index.controller";
 import * as analytics_controller from "../controllers/analytics.controller";
 
 const router = Router();
@@ -12,7 +11,7 @@ router.use(bodyParser.json());
 
 router.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
     try{
-      req.links = await links_controller.getAllLinks();
+      req.links = await analytics_controller.getAllLinks();
       req.no_match = true;
       next();
     }catch (err) {
@@ -21,7 +20,7 @@ router.use(async (req: Request, _, next: NextFunction): Promise<void> =>{
   });
 
 router.get("/most-redirected/", (req: Request, res: Response): void => {
-    res.status(200).json(analytics_controller.getAllRedirect(req.links));
+    res.status(200).json(analytics_controller.getAllRedirects(req.links));
 });
 
 router.get("/most-redirected/:count", (req: Request, res: Response): void => {

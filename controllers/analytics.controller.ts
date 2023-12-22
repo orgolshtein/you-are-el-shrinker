@@ -1,8 +1,17 @@
-import { StatsObject, LinkObject, host, port } from "../index";
+import { StatsObject, LinkObject, host, port, RedirectObject } from "../index";
+import * as links_model from "../models/links.model";
 
-export const getAllRedirect = (links: LinkObject[] | undefined): StatsObject[] => {
+export const getAllLinks = async (): Promise<LinkObject[] | undefined> => {
+    try{
+        return await links_model.getAllLinks();
+    } catch (err){
+        console.log(err);
+    }
+};
+
+export const getAllRedirects = (links: LinkObject[] | undefined): StatsObject[] => {
     let countArr: StatsObject[] = [];
-    links?.forEach((link): void => {
+    links?.forEach((link: LinkObject): void => {
         let count: number = link.shrinks.length;
         countArr.push({site: link.target, counter: count})
     })
@@ -12,13 +21,13 @@ export const getAllRedirect = (links: LinkObject[] | undefined): StatsObject[] =
 };
 
 export const getTopRedirects = (links: LinkObject[] | undefined, param: string): StatsObject[] => 
-getAllRedirect(links).filter((item, i): StatsObject | null => i<Number(param)? item : null);
+getAllRedirects(links).filter((item: StatsObject, i: number): StatsObject | null => i<Number(param)? item : null);
 
 export const getAllVisits = (links: LinkObject[] | undefined): StatsObject[] => {
     let countArr: StatsObject[] = [];
-    links?.forEach((link): void => {
+    links?.forEach((link: LinkObject): void => {
         let count: number = 0;
-        link.shrinks.forEach((redirect): void =>{
+        link.shrinks.forEach((redirect: RedirectObject): void =>{
             count += redirect.visits;
         })
         countArr.push({site: link.target, counter: count})
@@ -29,7 +38,7 @@ export const getAllVisits = (links: LinkObject[] | undefined): StatsObject[] => 
 };
 
 export const getTopVisits = (links: LinkObject[] | undefined, param: string): StatsObject[] => 
-getAllVisits(links).filter((item, i): StatsObject | null => i<Number(param)? item : null);
+getAllVisits(links).filter((item: StatsObject, i: number): StatsObject | null => i<Number(param)? item : null);
 
 export const getAllLastestVisits = (links: LinkObject[] | undefined): StatsObject[] => {
     let countArr: StatsObject[] = [];
@@ -50,12 +59,12 @@ export const getAllLastestVisits = (links: LinkObject[] | undefined): StatsObjec
 };
 
 export const getLastestVisits = (links: LinkObject[] | undefined, param: string): boolean | {} => 
-getAllLastestVisits(links).filter((item, i): StatsObject | null => i<Number(param)? item : null);
+getAllLastestVisits(links).filter((item: StatsObject, i: number): StatsObject | null => i<Number(param)? item : null);
 
 export const getLinkStats = (links: LinkObject[] | undefined, no_match: boolean, param: string): any => {
     let linkObj: {} = {};
     links?.forEach((link): void => {
-        link.shrinks.forEach((item): any =>{
+        link.shrinks.forEach((item: RedirectObject): any =>{
             if (item.link === param) {
                 no_match = false;
                 linkObj = { target: link.target, ...item, link: `http://${host}:${port}/${item.link}` };

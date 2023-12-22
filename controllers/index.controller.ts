@@ -1,23 +1,15 @@
 import * as links_model from "../models/links.model";
-import { LinkObject } from "../index";
+import { LinkObject, RedirectObject } from "../index";
 
-export const getAllLinks = async (): Promise<LinkObject[] | undefined> => {
+export const useLink = async (redirect_link: string): Promise<string | undefined> => {
     try{
-        return await links_model.getAllLinks();
-    } catch (err){
-        console.log(err);
-    }
-};
-
-export const useLink = async (param: string): Promise<string | undefined> => {
-    try{
-        const linkObj: LinkObject | undefined = await links_model.getLinkbyRedirect(param);
+        const linkObj: LinkObject | undefined = await links_model.getLink(redirect_link, null);
         if (linkObj !== undefined){
-            linkObj.shrinks.forEach((item, i): void => {
-                if (item.link === param){
+            linkObj.shrinks.forEach((item: RedirectObject, i: number): void => {
+                if (item.link === redirect_link){
                     linkObj.shrinks.splice(i, 1 ,{
                         _id: item._id,
-                        link: param,
+                        link: redirect_link,
                         visits: item.visits + 1,
                         last_visit: new Date(Date.now()).toString(),
                         last_visit_ms: Date.now()
