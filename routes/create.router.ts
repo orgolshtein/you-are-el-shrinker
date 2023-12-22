@@ -2,7 +2,7 @@ import { Router, NextFunction, Request, Response } from "express";
 import bodyParser from "body-parser";
 
 import * as create_controller from "../controllers/create.controller";
-import { LinkObject, RedirectObject } from "..";
+import { RedirectObject } from "..";
 
 const router = Router();
 

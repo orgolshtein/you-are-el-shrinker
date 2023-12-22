@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
-import * as links_controller from "../controllers/links.controller";
+import * as links_controller from "../controllers/index.controller";
 import * as analytics_controller from "../controllers/analytics.controller";
 
 const router = Router();

@@ -1,9 +1,9 @@
-import * as link_model from "../models/links.model";
+import * as links_model from "../models/links.model";
 import { LinkObject } from "../index";
 
 export const getAllLinks = async (): Promise<LinkObject[] | undefined> => {
     try{
-        return await link_model.getAllLinks();
+        return await links_model.getAllLinks();
     } catch (err){
         console.log(err);
     }
@@ -11,7 +11,7 @@ export const getAllLinks = async (): Promise<LinkObject[] | undefined> => {
 
 export const useLink = async (param: string): Promise<string | undefined> => {
     try{
-        const linkObj: LinkObject | undefined = await link_model.getLinkbyRedirect(param);
+        const linkObj: LinkObject | undefined = await links_model.getLinkbyRedirect(param);
         if (linkObj !== undefined){
             linkObj.shrinks.forEach((item, i): void => {
                 if (item.link === param){
@@ -24,7 +24,7 @@ export const useLink = async (param: string): Promise<string | undefined> => {
                     });
                 }
             })
-            await link_model.updateLink(linkObj)
+            await links_model.updateLink(linkObj)
             return linkObj.target
         }
     } catch (err){

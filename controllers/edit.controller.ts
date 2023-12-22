@@ -1,12 +1,11 @@
-import * as edit_model from "../models/edit.model";
-import * as link_model from "../models/links.model";
+import * as links_model from "../models/links.model";
 import { LinkObject, RedirectObject, host, port } from "../index";
 import { ObjectId } from "mongodb";
 
 export const editLink = async (id: string, new_link: string): Promise<RedirectObject | boolean | undefined> => {
   try{
-    const matchObj: LinkObject | undefined = await link_model.getLinkbyRedirect(new_link); 
-    const linkObj: LinkObject | undefined = await edit_model.getLinkbyId(id);
+    const matchObj: LinkObject | undefined = await links_model.getLinkbyRedirect(new_link); 
+    const linkObj: LinkObject | undefined = await links_model.getLinkbyId(id);
     let redirectObj: RedirectObject = {
         _id: new ObjectId,
         link: "",
@@ -32,7 +31,7 @@ export const editLink = async (id: string, new_link: string): Promise<RedirectOb
                     redirectObj = linkObj.shrinks[i]
                 }
             })
-            await link_model.updateLink(linkObj)
+            await links_model.updateLink(linkObj)
             return redirectObj
         }
     }
@@ -42,5 +41,5 @@ export const editLink = async (id: string, new_link: string): Promise<RedirectOb
 };
 
 export const deleteAllLinks = async (): Promise<any> => {
-  return await edit_model.deleteAllLinks();
+  return await links_model.deleteAllLinks();
 };

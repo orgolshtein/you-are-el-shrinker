@@ -9,7 +9,7 @@ import { mongoConnect } from "./db/mongo.connect";
 import createRouter from "./routes/create.router";
 import editRouter from "./routes/edit.router";
 import analyticsRouter from "./routes/analytics.router";
-import * as links_controller from "./controllers/links.controller";
+import * as controller from "./controllers/index.controller";
 
 dotenv.config();
 
@@ -68,7 +68,7 @@ app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
-    const target: string | undefined = await links_controller.useLink(req.params.shrinked);
+    const target: string | undefined = await controller.useLink(req.params.shrinked);
     target !== undefined ? res.redirect(target): res.status(404).send(req.no_path_err)
   }catch (err){
     next(err)
