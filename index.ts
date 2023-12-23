@@ -10,6 +10,8 @@ import createRouter from "./routes/create.router";
 import editRouter from "./routes/edit.router";
 import analyticsRouter from "./routes/analytics.router";
 import * as controller from "./controllers/index.controller";
+import { generalErrorHandler, noPathHandler } from "./middleware/error.handler";
+import { asyncRoute } from "./middleware/async.handler";
 
 dotenv.config();
 
@@ -56,32 +58,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use((req: Request, _, next: NextFunction): void =>{
-    req.no_path_err = `Path "${req.url}" not found for method "${req.method}"`;
-    next();
+  req.no_path_err = `Path "${req.url}" not found for method "${req.method}"`;
+  next();
 });
 
 app.use("/api/create", createRouter);
 app.use("/api/edit", editRouter);
 app.use("/api/analytics", analyticsRouter);
 
-app.get("/:shrinked", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try{
-    const target: string | undefined = await controller.useLink(req.params.shrinked);
-    target !== undefined ? res.redirect(target): res.status(404).send(req.no_path_err)
-  }catch (err){
-    next(err)
-  }
-});
+app.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const target: string | undefined = await controller.useLink(req.params.shrinked);
+  target !== undefined ? res.redirect(target): res.status(404).send(req.no_path_err)
+}));
 
 app.use("/", express.static("public"));
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction): void =>{
-  res.status(500).json(err.message)
-});
+app.use(generalErrorHandler);
 
-app.use("*", (req: Request, res: Response): void =>{
-  res.status(404).send(req.no_path_err)
-});
+app.use("*", noPathHandler);
 
 (async (): Promise<void> => {
   try{

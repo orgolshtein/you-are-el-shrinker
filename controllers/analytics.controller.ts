@@ -1,13 +1,10 @@
 import { StatsObject, LinkObject, host, port, RedirectObject } from "../index";
+import { asyncHandler } from "../middleware/async.handler";
 import * as links_model from "../models/links.model";
 
-export const getAllLinks = async (): Promise<LinkObject[] | undefined> => {
-    try{
-        return await links_model.getAllLinks();
-    } catch (err){
-        console.log(err);
-    }
-};
+export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefined> => {
+    return await links_model.getAllLinks();
+});
 
 export const getTopStats = (func: Function, type: string, links: LinkObject[] | undefined, param: string): StatsObject[] => 
 func(type, links).filter((item: StatsObject, i: number): StatsObject | null => i<Number(param)? item : null);

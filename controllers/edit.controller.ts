@@ -2,9 +2,9 @@ import { ObjectId } from "mongodb";
 
 import * as links_model from "../models/links.model";
 import { LinkObject, RedirectObject, host, port } from "../index";
+import { asyncHandler } from "../middleware/async.handler";
 
-export const editLink = async (redirect_id: string, new_redirect: string): Promise<RedirectObject | boolean | undefined> => {
-  try{
+export const editLink = asyncHandler(async (redirect_id: string, new_redirect: string): Promise<RedirectObject | boolean | undefined> => {
     const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect, null); 
     const linkObj: LinkObject | undefined = await links_model.getLink(redirect_id, "by_id");
     let redirectObj: RedirectObject = {
@@ -35,15 +35,8 @@ export const editLink = async (redirect_id: string, new_redirect: string): Promi
             await links_model.updateLink(linkObj)
             return redirectObj
         }}
-    } catch (err){
-        console.log(err);
-    }
-};
+});
 
-export const deleteAllLinks = async (): Promise<any> => {
-    try{
-        return await links_model.deleteAllLinks();
-    } catch (err){
-        console.log(err);
-    }
-};
+export const deleteAllLinks = asyncHandler(async (): Promise<any> => {
+    return await links_model.deleteAllLinks();
+});
