@@ -8,7 +8,11 @@ export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefin
     return await db.collection("links").find().toArray();
 });
 
-export const getLink = asyncHandler(async (prop: string, get_by: string | null, param?: string): Promise<LinkObject | undefined> => {
+export const getLink = asyncHandler(async (
+    prop: string, 
+    get_by: string | null, 
+    param?: string
+    ): Promise<LinkObject | undefined> => {
     let linkArr: LinkObject[];
     switch (get_by) {
         case "by_target":
@@ -26,7 +30,7 @@ export const getLink = asyncHandler(async (prop: string, get_by: string | null, 
     return linkArr[0];
 });
 
-export const updateLink = asyncHandler(async (obj: LinkObject) => {
+export const updateLink = asyncHandler(async (obj: LinkObject): Promise<void> => {
     return await db.collection("links").replaceOne({ _id: obj._id }, { ...obj });
 });
 

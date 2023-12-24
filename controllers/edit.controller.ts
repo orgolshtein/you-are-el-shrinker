@@ -4,7 +4,10 @@ import * as links_model from "../models/links.model";
 import { LinkObject, RedirectObject, host, port } from "../index";
 import { asyncHandler } from "../middleware/async.handler";
 
-export const editLink = asyncHandler(async (redirect_id: string, new_redirect: string): Promise<RedirectObject | boolean | undefined> => {
+export const editLink = asyncHandler(async (
+    redirect_id: string, 
+    new_redirect: string)
+    : Promise<RedirectObject | boolean | undefined> => {
     const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect, null); 
     const linkObj: LinkObject | undefined = await links_model.getLink(redirect_id, "by_id");
     let redirectObj: RedirectObject = {
@@ -37,6 +40,6 @@ export const editLink = asyncHandler(async (redirect_id: string, new_redirect: s
         }}
 });
 
-export const deleteAllLinks = asyncHandler(async (): Promise<any> => {
+export const deleteAllLinks = asyncHandler(async (): Promise<void> => {
     return await links_model.deleteAllLinks();
 });

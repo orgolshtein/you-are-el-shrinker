@@ -4,7 +4,10 @@ import * as links_model from "../models/links.model";
 import { LinkObject, RedirectObject, port, host } from "../index";
 import { asyncHandler } from "../middleware/async.handler";
 
-export const createLink = asyncHandler(async (target_value: string, param: string): Promise<RedirectObject | undefined> => {
+export const createLink = asyncHandler(async (
+  target_value: string, 
+  param: string
+  ): Promise<RedirectObject | undefined> => {
   const randomHash: string = (Math.random() + 1).toString(36).substring(5);
   const linkObj: LinkObject | undefined = await links_model.getLink(target_value, "by_target", param);
   const newRedirectObj: RedirectObject = {

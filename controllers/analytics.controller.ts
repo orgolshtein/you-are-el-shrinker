@@ -1,12 +1,17 @@
-import { StatsObject, LinkObject, host, port, RedirectObject } from "../index";
-import { asyncHandler } from "../middleware/async.handler";
 import * as links_model from "../models/links.model";
+import { LinkObject, RedirectObject, StatsObject, port, host } from "../index";
+import { asyncHandler } from "../middleware/async.handler";
 
 export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefined> => {
     return await links_model.getAllLinks();
 });
 
-export const getTopStats = (func: Function, type: string, links: LinkObject[] | undefined, param: string): StatsObject[] => 
+export const getTopStats = (
+    func: Function, 
+    type: string, 
+    links: LinkObject[] | undefined, 
+    param: string
+    ): StatsObject[] => 
 func(type, links).filter((item: StatsObject, i: number): StatsObject | null => i<Number(param)? item : null);
 
 export const getStats = (type: string, links: LinkObject[] | undefined): StatsObject[] => {
@@ -46,7 +51,11 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
     return countArr;
 };
 
-export const getLinkStats = (links: LinkObject[] | undefined, no_match: boolean, param: string): StatsObject | boolean => {
+export const getLinkStats = (
+    links: LinkObject[] | undefined, 
+    no_match: boolean, 
+    param: string
+    ): StatsObject | boolean => {
     let linkObj: StatsObject = {};
     links?.forEach((link): void => {
         link.shrinks.forEach((item: RedirectObject): void =>{

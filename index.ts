@@ -1,4 +1,4 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
@@ -11,7 +11,7 @@ import editRouter from "./routes/edit.router";
 import analyticsRouter from "./routes/analytics.router";
 import * as controller from "./controllers/index.controller";
 import { generalErrorHandler, noPathHandler } from "./middleware/error.handler";
-import { asyncRoute } from "./middleware/async.handler";
+import { asyncHandler, asyncRoute } from "./middleware/async.handler";
 
 dotenv.config();
 
@@ -57,7 +57,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-app.use((req: Request, _, next: NextFunction): void =>{
+app.use((req: Request, _, next: NextFunction): void => {
   req.no_path_err = `Path "${req.url}" not found for method "${req.method}"`;
   next();
 });
@@ -77,13 +77,9 @@ app.use(generalErrorHandler);
 
 app.use("*", noPathHandler);
 
-(async (): Promise<void> => {
-  try{
+(asyncHandler(async (): Promise<void> => {
     await mongoConnect(db_uri, db_name);
     await app.listen( {port, host}, (): void => {
       console.log(`Server is running at http://${host}:${port}`);
     })
-  }catch (err){
-    console.log(err)
-  }
-})();
+}))();

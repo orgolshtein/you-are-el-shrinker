@@ -22,7 +22,12 @@ router.get("/most-redirected/", (req: Request, res: Response): void => {
 });
 
 router.get("/most-redirected/:count", (req: Request, res: Response): void => {
-    res.status(200).json(analytics_controller.getTopStats(analytics_controller.getStats, "redirects" ,req.links, req.params.count));
+    res.status(200).json(analytics_controller.getTopStats(
+        analytics_controller.getStats, 
+        "redirects",
+        req.links, 
+        req.params.count
+        ));
 });
 
 router.get("/most-visited", (req: Request, res: Response): void => {
@@ -30,7 +35,12 @@ router.get("/most-visited", (req: Request, res: Response): void => {
 });
 
 router.get("/most-visited/:count", (req: Request, res: Response): void => {
-    res.status(200).json(analytics_controller.getTopStats(analytics_controller.getStats, "visits" , req.links, req.params.count));
+    res.status(200).json(analytics_controller.getTopStats(
+        analytics_controller.getStats, 
+        "visits", 
+        req.links, 
+        req.params.count
+        ));
 });
 
 router.get("/last-visited", (req: Request, res: Response): void => {
@@ -38,11 +48,20 @@ router.get("/last-visited", (req: Request, res: Response): void => {
 });
 
 router.get("/last-visited/:count", (req: Request, res: Response): void => {
-    res.status(200).json(analytics_controller.getTopStats(analytics_controller.getStats, "latest" , req.links, req.params.count));
+    res.status(200).json(analytics_controller.getTopStats(
+        analytics_controller.getStats, 
+        "latest", 
+        req.links, 
+        req.params.count
+        ));
 });
 
 router.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(req.links, req.no_match, req.params.shrinked);
+    const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
+        req.links, 
+        req.no_match, 
+        req.params.shrinked
+        );
     typeof linkObj === "boolean" ? 
     res.status(404).send(req.no_path_err) : 
     res.status(200).json({target: linkObj.target, ...linkObj, link: linkObj.link});
