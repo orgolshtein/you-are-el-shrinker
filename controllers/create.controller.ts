@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 import * as links_model from "../models/links.model.js";
-import { LinkObject, RedirectObject, port, host } from "../index.js";
+import { LinkObject, RedirectObject, port, host, prod_link } from "../index.js";
 import { asyncHandler } from "../middleware/async.handler.js";
 
 export const createLink = asyncHandler(async (
@@ -24,10 +24,10 @@ export const createLink = asyncHandler(async (
       shrinks: [{...newRedirectObj}]
     }
     await links_model.createLink(newLinkObj);
-    return {...newRedirectObj, output: `http://${host}:${port}/${randomHash}`}
+    return {...newRedirectObj, output: `${prod_link}/${randomHash}`}
   } else {
     linkObj.shrinks.push(newRedirectObj);
     await links_model.updateLink(linkObj);
-    return {...newRedirectObj, output: `http://${host}:${port}/${randomHash}`}
+    return {...newRedirectObj, output: `${prod_link}/${randomHash}`}
   }
 });

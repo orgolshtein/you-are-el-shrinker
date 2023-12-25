@@ -1,5 +1,5 @@
 import * as links_model from "../models/links.model.js";
-import { LinkObject, RedirectObject, StatsObject, port, host } from "../index.js";
+import { LinkObject, RedirectObject, StatsObject, port, host, prod_link } from "../index.js";
 import { asyncHandler } from "../middleware/async.handler.js";
 
 export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefined> => {
@@ -61,7 +61,7 @@ export const getLinkStats = (
         link.shrinks.forEach((item: RedirectObject): void =>{
             if (item.link === param) {
                 no_match = false;
-                linkObj = { target: link.target, ...item, link: `http://${host}:${port}/${item.link}` };
+                linkObj = { target: link.target, ...item, link: `${prod_link}/${item.link}` };
             }
         })
     });

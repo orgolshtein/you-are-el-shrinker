@@ -46,6 +46,7 @@ export const port: string | undefined = process.env.PORT;
 export const host: string | undefined = process.env.HOST;
 export const db_uri: string | undefined = process.env.DB_URI;
 export const db_name: string | undefined = process.env.DB_NAME;
+export const prod_link: string | undefined = process.env.PROD_LINK;
 
 app.use(cors());
 

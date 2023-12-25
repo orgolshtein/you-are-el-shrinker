@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 import * as links_model from "../models/links.model.js";
-import { LinkObject, RedirectObject, host, port } from "../index.js";
+import { LinkObject, RedirectObject, host, port, prod_link } from "../index.js";
 import { asyncHandler } from "../middleware/async.handler.js";
 
 export const editLink = asyncHandler(async (
@@ -30,7 +30,7 @@ export const editLink = asyncHandler(async (
                         visits: item.visits,
                         last_visit: item.last_visit,
                         last_visit_ms: item.last_visit_ms,
-                        output: `http://${host}:${port}/${new_redirect}`
+                        output: `${prod_link}/${new_redirect}`
                     });
                     redirectObj = linkObj.shrinks[i]
                 }
@@ -38,8 +38,4 @@ export const editLink = asyncHandler(async (
             await links_model.updateLink(linkObj)
             return redirectObj
         }}
-});
-
-export const deleteAllLinks = asyncHandler(async (): Promise<void> => {
-    return await links_model.deleteAllLinks();
 });
