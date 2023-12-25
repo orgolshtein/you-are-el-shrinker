@@ -62,7 +62,7 @@
     async function getNewLink(){
         try {
             const target = document.querySelector("#target-link-input").value.replaceAll("\"","").replace("http://", "").replace("https://", "");
-            const url = `http://localhost:3020/api/create/${target}`;
+            const url = `/api/create/${target}`;
             const options = {
             method: 'POST' 
             };
@@ -74,9 +74,8 @@
                 id = data._id.toString();
                 document.querySelector("#edit-button").classList.remove("hidden");
             } else{
-                document.querySelector("#output").innerHTML = `<span style="color: red">${data}</span>`
+                document.querySelector("#output").innerHTML = `<span style="color: red">${data}</span>`;
                 document.querySelector("#edit-button").classList.add("hidden");
-
             }
         }
         catch (err) {
@@ -89,7 +88,7 @@
 
     async function editLink(){
         try{
-            const url = `http://localhost:3020/api/edit/${id}`;
+            const url = `/api/edit/${id}`;
             const options = {
                 method: 'PATCH',
                 headers: {
@@ -112,19 +111,23 @@
     };
 
     function getStats(){
-        getAnalytics("most-redirected", "Shrinks");
-        getAnalytics("most-visited", "Visits");
-        getAnalytics("last-visited", "Visited");
+        getAnalytics("most-redirected", "Shrinks", 4);
+        getAnalytics("most-visited", "Visits", 4);
+        getAnalytics("last-visited", "Visited", 4);
     };
 
-    async function getAnalytics(query, th_title){
+    async function getAnalytics(query, th_title, amount){
         try{
-            const url = `http://localhost:3020/api/analytics/${query}/3`;
+            let url;
+            amount?
+            url = `/api/analytics/${query}/${amount}`:
+            url = `/api/analytics/${query}`
             const options = {
             method: 'GET' 
             };
             const res = await fetch(url,options)
             const data = await res.json();
+            console.log(data);
             document.querySelector(`#${query}`).innerHTML = `
             <table style="border-collapse:collapse; border: 1px solid black">
                 <thead>
@@ -134,21 +137,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style="border-collapse:collapse; border: 1px solid black">${data[0].site}</td>
-                        <td align="center" style="border-collapse:collapse; border: 1px solid black">${data[0].visit_date? data[0].visit_date : data[0].counter}</td>
-                    </tr>
-                    <tr>
-                        <td style="border-collapse:collapse; border: 1px solid black">${data[1].site}</td>
-                        <td align="center" style="border-collapse:collapse; border: 1px solid black">${data[1].visit_date? data[1].visit_date : data[1].counter}</td>
-                    </tr>
-                    <tr>
-                        <td style="border-collapse:collapse; border: 1px solid black">${data[2].site}</td>
-                        <td align="center" style="border-collapse:collapse; border: 1px solid black">${data[2].visit_date? data[2].visit_date : data[2].counter}</td>
-                    </tr>
                 </tbody>
             </table>
             `
+            data.forEach(item => {
+                document.querySelector(`#${query} tbody`).innerHTML += `
+                <tr>
+                    <td style="border-collapse:collapse; border: 1px solid black">${item.site}</td>
+                    <td align="center" style="border-collapse:collapse; border: 1px solid black">${item.visit_date? item.visit_date : item.counter}</td>
+                </tr>
+                `              
+            });
         } catch (err) {
             document.querySelector(`#${query}`).innerHTML = `<span style="color: red">${err.message}</span>`;
         }
@@ -157,36 +156,40 @@
     async function getShrinkedData(){
         try{
             const target = document.querySelector("#shrink-link-input").value.replaceAll("http://localhost:3020/","");
-            const url = `http://localhost:3020/api/analytics/${target}`;
+            const url = `/api/analytics/${target}`;
             const options = {
             method: 'GET' 
             };
             const res = await fetch(url,options)
             const data = await res.json();
-            document.querySelector("#full-site-stats").innerHTML = `
-            <table style="border-collapse:collapse; border: 1px solid black">
-                <thead>
-                    <tr align="left">
-                        <th style="border-collapse:collapse; border: 1px solid black">Shrinked</th>
-                        <th style="border-collapse:collapse; border: 1px solid black"><a href=${data.link} target="_blank">${data.link}</a></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border-collapse:collapse; border: 1px solid black">Target</td>
-                        <td style="border-collapse:collapse; border: 1px solid black">${data.target}</td>
-                    </tr>
-                    <tr>
-                        <td style="border-collapse:collapse; border: 1px solid black">Clicks</td>
-                        <td style="border-collapse:collapse; border: 1px solid black">${data.visits}</td>
-                    </tr>
-                    <tr>
-                        <td style="border-collapse:collapse; border: 1px solid black">Last Visited</td>
-                        <td style="border-collapse:collapse; border: 1px solid black">${data.last_visit}</td>
-                    </tr>
-                </tbody>
-            </table>
-            `
+            if (typeof data !== "string"){
+                document.querySelector("#full-site-stats").innerHTML = `
+                <table style="border-collapse:collapse; border: 1px solid black">
+                    <thead>
+                        <tr align="left">
+                            <th style="border-collapse:collapse; border: 1px solid black">Shrinked</th>
+                            <th style="border-collapse:collapse; border: 1px solid black"><a href=${data.link} target="_blank">${data.link}</a></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border-collapse:collapse; border: 1px solid black">Target</td>
+                            <td style="border-collapse:collapse; border: 1px solid black">${data.target}</td>
+                        </tr>
+                        <tr>
+                            <td style="border-collapse:collapse; border: 1px solid black">Clicks</td>
+                            <td style="border-collapse:collapse; border: 1px solid black">${data.visits}</td>
+                        </tr>
+                        <tr>
+                            <td style="border-collapse:collapse; border: 1px solid black">Last Visited</td>
+                            <td style="border-collapse:collapse; border: 1px solid black">${data.last_visit}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                `
+            } else {
+                document.querySelector(`#full-site-stats`).innerHTML = `<span style="color: red">${data}</span>`;
+            }
         } catch (err) {
             document.querySelector(`#full-site-stats`).innerHTML = `<span style="color: red">${err.message}</span>`;
         }

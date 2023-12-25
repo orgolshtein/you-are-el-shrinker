@@ -17,7 +17,7 @@ router.patch("/:id", asyncRoute(async (req: Request, res: Response, next: NextFu
         req.body.new_link
         );
     redirectObj === false ?
-    res.status(500).send("Path is already in use") :
+    res.status(500).json("Path is already in use") :
     redirectObj !== undefined && typeof redirectObj !== "boolean"? 
     res.status(200).json({_id: redirectObj._id, output: redirectObj.output}): 
     res.status(404).send(req.no_path_err)

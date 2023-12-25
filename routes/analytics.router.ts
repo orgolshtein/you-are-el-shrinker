@@ -63,7 +63,7 @@ router.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: Ne
         req.params.shrinked
         );
     typeof linkObj === "boolean" ? 
-    res.status(404).send(req.no_path_err) : 
+    res.status(404).json("Link not found") : 
     res.status(200).json({target: linkObj.target, ...linkObj, link: linkObj.link});
 }));
 

@@ -18,7 +18,7 @@ const createLink = asyncRoute(async (req: Request, res: Response, next: NextFunc
     )
   newLink !== undefined ? 
   res.status(200).json({_id: newLink._id, output: newLink.output}): 
-  res.status(404).send(req.no_path_err);
+  (err: Error) => next(err);
 });
 
 router.post("/", (req: Request, res: Response, next: NextFunction): void => {
