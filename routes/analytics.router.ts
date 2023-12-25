@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
-import * as analytics_controller from "../controllers/analytics.controller";
-import { StatsObject } from "../index";
-import { asyncRoute } from "../middleware/async.handler";
+import * as analytics_controller from "../controllers/analytics.controller.js";
+import { StatsObject } from "../index.js";
+import { asyncRoute } from "../middleware/async.handler.js";
 
 const router = Router();
 

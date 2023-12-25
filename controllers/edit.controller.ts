@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 
-import * as links_model from "../models/links.model";
-import { LinkObject, RedirectObject, host, port } from "../index";
-import { asyncHandler } from "../middleware/async.handler";
+import * as links_model from "../models/links.model.js";
+import { LinkObject, RedirectObject, host, port } from "../index.js";
+import { asyncHandler } from "../middleware/async.handler.js";
 
 export const editLink = asyncHandler(async (
     redirect_id: string, 

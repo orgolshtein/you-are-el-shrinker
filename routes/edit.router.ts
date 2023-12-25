@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
-import * as edit_controller from "../controllers/edit.controller";
-import { RedirectObject } from "../index";
-import { asyncRoute } from "../middleware/async.handler";
+import * as edit_controller from "../controllers/edit.controller.js";
+import { RedirectObject } from "../index.js";
+import { asyncRoute } from "../middleware/async.handler.js";
 
 const router = Router();
 

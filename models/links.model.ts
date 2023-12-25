@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 
-import { db } from "../db/mongo.connect";
-import { LinkObject } from "../index";
-import { asyncHandler } from "../middleware/async.handler";
+import { db } from "../db/mongo.connect.js";
+import { LinkObject } from "../index.js";
+import { asyncHandler } from "../middleware/async.handler.js";
 
 export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefined> => {
     return await db.collection("links").find().toArray();

@@ -2,10 +2,11 @@
   "name": "backend-you-are-el-shrinker",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.ts",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/index.mjs",
+    "start": "node dist/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "author": "",

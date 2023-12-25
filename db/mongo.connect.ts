@@ -1,5 +1,6 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-import { asyncHandler } from "../middleware/async.handler";
+
+import { asyncHandler } from "../middleware/async.handler.js";
 
 export let db: any;
 

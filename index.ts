@@ -5,13 +5,13 @@ import morgan from "morgan";
 import bodyParser  from "body-parser";
 import { ObjectId } from "mongodb";
 
-import { mongoConnect } from "./db/mongo.connect";
-import createRouter from "./routes/create.router";
-import editRouter from "./routes/edit.router";
-import analyticsRouter from "./routes/analytics.router";
-import * as controller from "./controllers/index.controller";
-import { generalErrorHandler, noPathHandler } from "./middleware/error.handler";
-import { asyncHandler, asyncRoute } from "./middleware/async.handler";
+import { mongoConnect } from "./db/mongo.connect.js";
+import createRouter from "./routes/create.router.js";
+import editRouter from "./routes/edit.router.js";
+import analyticsRouter from "./routes/analytics.router.js";
+import * as controller from "./controllers/index.controller.js";
+import { generalErrorHandler, noPathHandler } from "./middleware/error.handler.js";
+import { asyncHandler, asyncRoute } from "./middleware/async.handler.js";
 
 dotenv.config();
 

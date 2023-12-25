@@ -1,6 +1,6 @@
-import * as links_model from "../models/links.model";
-import { LinkObject, RedirectObject } from "../index";
-import { asyncHandler } from "../middleware/async.handler";
+import * as links_model from "../models/links.model.js";
+import { LinkObject, RedirectObject } from "../index.js";
+import { asyncHandler } from "../middleware/async.handler.js";
 
 export const useLink = asyncHandler(async (redirect_link: string): Promise<string | undefined> => {
     const linkObj: LinkObject | undefined = await links_model.getLink(redirect_link, null);
