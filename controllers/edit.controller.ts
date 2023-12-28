@@ -29,13 +29,12 @@ export const editLink = asyncHandler(async (
                         link: new_redirect,
                         visits: item.visits,
                         last_visit: item.last_visit,
-                        last_visit_ms: item.last_visit_ms,
-                        output: `${prod_link}/${new_redirect}`
+                        last_visit_ms: item.last_visit_ms
                     });
                     redirectObj = linkObj.shrinks[i]
                 }
             })
             await links_model.updateLink(linkObj)
-            return redirectObj
+            return {...redirectObj, output: `${prod_link}/${new_redirect}`}
         }}
 });

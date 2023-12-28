@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import * as analytics_controller from "../controllers/analytics.controller.js";
 import { StatsObject } from "../index.js";
 import { asyncRoute } from "../middleware/async.handler.js";
+import { noPathHandler } from "../middleware/error.handler.js";
 
 const router = Router();
 
@@ -62,9 +63,12 @@ router.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: Ne
         req.no_match, 
         req.params.shrinked
         );
-    typeof linkObj === "boolean" ? 
-    res.status(404).json("Link not found") : 
-    res.status(200).json({target: linkObj.target, ...linkObj, link: linkObj.link});
+    if (typeof linkObj === "boolean"){
+        req.no_path_err = "Link not found";
+        noPathHandler(req, res);
+    } else{
+        res.status(200).json({target: linkObj.target, ...linkObj, link: linkObj.link});
+    }
 }));
 
 export default router;

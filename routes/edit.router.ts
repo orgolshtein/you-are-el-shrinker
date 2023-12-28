@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import * as edit_controller from "../controllers/edit.controller.js";
 import { RedirectObject } from "../index.js";
 import { asyncRoute } from "../middleware/async.handler.js";
+import { noPathHandler } from "../middleware/error.handler.js";
 
 const router = Router();
 
@@ -16,11 +17,14 @@ router.patch("/:id", asyncRoute(async (req: Request, res: Response, next: NextFu
         req.params.id, 
         req.body.new_link
         );
-    redirectObj === false ?
-    res.status(500).json("Path is already in use") :
-    redirectObj !== undefined && typeof redirectObj !== "boolean"? 
-    res.status(200).json({_id: redirectObj._id, output: redirectObj.output}): 
-    res.status(404).send(req.no_path_err)
+    if (redirectObj === false){
+        req.no_path_err = "Path is already in use";
+        noPathHandler(req, res);
+    } else {
+        redirectObj !== undefined && typeof redirectObj !== "boolean" ? 
+        res.status(200).json({_id: redirectObj._id, output: redirectObj.output}): 
+        noPathHandler(req, res);
+    }
 }));
 
 export default router;

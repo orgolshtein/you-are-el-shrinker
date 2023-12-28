@@ -59,7 +59,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use((req: Request, _, next: NextFunction): void => {
-  req.no_path_err = `Path "${req.url}" not found for method "${req.method}"`;
+  req.no_path_err = `Path ${req.url} not found for method ${req.method}`;
   next();
 });
 
@@ -69,7 +69,7 @@ app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const target: string | undefined = await controller.useLink(req.params.shrinked);
-  target !== undefined ? res.redirect(target): res.status(404).send(req.no_path_err)
+  target !== undefined ? res.redirect(target): noPathHandler(req, res);
 }));
 
 app.use("/", express.static("public"));

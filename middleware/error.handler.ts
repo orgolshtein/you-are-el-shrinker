@@ -5,5 +5,5 @@ export const generalErrorHandler = (err: Error, req: Request, res: Response, nex
 };
   
 export const noPathHandler =  (req: Request, res: Response): void =>{
-    res.status(404).send(req.no_path_err);
+    res.status(404).json(req.no_path_err);
   };
