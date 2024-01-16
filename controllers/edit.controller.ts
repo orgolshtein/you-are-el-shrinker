@@ -1,14 +1,15 @@
 import { ObjectId } from "mongodb";
 
 import * as links_model from "../models/links.model.js";
-import { LinkObject, RedirectObject, host, port, prod_link } from "../index.js";
+import { LinkObject, RedirectObject, prod_link } from "../index.js";
 import { asyncHandler } from "../middleware/async.handler.js";
 
 export const editLink = asyncHandler(async (
     redirect_id: string, 
-    new_redirect: string)
+    new_redirect: string
+    )
     : Promise<RedirectObject | boolean | undefined> => {
-    const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect, null); 
+    const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect.replace("\\","\/"), null); 
     const linkObj: LinkObject | undefined = await links_model.getLink(redirect_id, "by_id");
     let redirectObj: RedirectObject = {
         _id: new ObjectId,
@@ -24,17 +25,12 @@ export const editLink = asyncHandler(async (
         if (linkObj !== undefined){
             linkObj.shrinks.forEach((item: RedirectObject, i: number): void => {
                 if (item._id.toString() === redirect_id){
-                    linkObj.shrinks.splice(i, 1 ,{
-                        _id: item._id,
-                        link: new_redirect,
-                        visits: item.visits,
-                        last_visit: item.last_visit,
-                        last_visit_ms: item.last_visit_ms
-                    });
+                    linkObj.shrinks[i].link = new_redirect.replace("\\","\/");
                     redirectObj = linkObj.shrinks[i]
                 }
             })
             await links_model.updateLink(linkObj)
-            return {...redirectObj, output: `${prod_link}/${new_redirect}`}
-        }}
+            return {...redirectObj, output: `${prod_link}/${redirectObj.link}`}
+        }
+    }
 });

@@ -24,20 +24,18 @@ export const getLink = asyncHandler(async (
             linkArr = await db.collection("links").find({ "shrinks._id": new ObjectId(prop) }).toArray();
             break;
         default:
+            param ?     
+            linkArr = await db.collection("links").find({ "shrinks.link": prop+"/"+param }).toArray():
             linkArr = await db.collection("links").find({ "shrinks.link": prop }).toArray();
             break;
     }
     return linkArr[0];
 });
 
-export const updateLink = asyncHandler(async (obj: LinkObject): Promise<void> => {
-    return await db.collection("links").replaceOne({ _id: obj._id }, { ...obj });
-});
-
 export const createLink = asyncHandler(async (link: LinkObject): Promise<void> => {
     return await db.collection("links").insertOne(link);
 });
 
-export const deleteAllLinks = asyncHandler(async (): Promise<void> => {
-    return await db.collection("links").deleteMany({});
+export const updateLink = asyncHandler(async (obj: LinkObject): Promise<void> => {
+    return await db.collection("links").replaceOne({ _id: obj._id }, { ...obj });
 });

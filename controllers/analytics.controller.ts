@@ -53,13 +53,14 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
 
 export const getLinkStats = (
     links: LinkObject[] | undefined, 
-    no_match: boolean, 
+    no_match: boolean,
+    redirect_link: string, 
     param: string
     ): StatsObject | boolean => {
     let linkObj: StatsObject = {};
     links?.forEach((link): void => {
         link.shrinks.forEach((item: RedirectObject): void =>{
-            if (item.link === param) {
+            if ((item.link === redirect_link) || (item.link === `${redirect_link}/${param}`)) {
                 no_match = false;
                 linkObj = { target: link.target, ...item, link: `${prod_link}/${item.link}` };
             }

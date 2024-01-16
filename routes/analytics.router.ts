@@ -18,6 +18,21 @@ router.use(asyncRoute(async (req: Request, res: Response, next: NextFunction): P
     next();
 }));
 
+const getLinkStats = asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
+        req.links, 
+        req.no_match, 
+        req.params.shrinked, 
+        req.params[0]
+        );
+    if (typeof linkObj === "boolean"){
+        req.no_path_err = "Link not found";
+        noPathHandler(req, res);
+    } else{
+        res.status(200).json({...linkObj});
+    }
+});
+
 router.get("/most-redirected/", (req: Request, res: Response): void => {
     res.status(200).json(analytics_controller.getStats("redirects" ,req.links));
 });
@@ -57,18 +72,8 @@ router.get("/last-visited/:count", (req: Request, res: Response): void => {
         ));
 });
 
-router.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
-        req.links, 
-        req.no_match, 
-        req.params.shrinked
-        );
-    if (typeof linkObj === "boolean"){
-        req.no_path_err = "Link not found";
-        noPathHandler(req, res);
-    } else{
-        res.status(200).json({target: linkObj.target, ...linkObj, link: linkObj.link});
-    }
-}));
+router.get("/:shrinked", getLinkStats);
+
+router.get("/:shrinked/*", getLinkStats);
 
 export default router;

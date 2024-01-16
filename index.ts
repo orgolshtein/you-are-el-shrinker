@@ -67,10 +67,14 @@ app.use("/api/create", createRouter);
 app.use("/api/edit", editRouter);
 app.use("/api/analytics", analyticsRouter);
 
-app.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const target: string | undefined = await controller.useLink(req.params.shrinked);
+const useLink = asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const target: string | undefined = await controller.useLink(req.params.shrinked, req.params[0]);
   target !== undefined ? res.redirect(target): noPathHandler(req, res);
-}));
+})
+
+app.get("/:shrinked", useLink);
+
+app.get("/:shrinked/*", useLink);
 
 app.use("/", express.static("public"));
 
