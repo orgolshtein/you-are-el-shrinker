@@ -9,7 +9,7 @@ export const editLink = asyncHandler(async (
     new_redirect: string
     )
     : Promise<RedirectObject | boolean | undefined> => {
-    const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect.replace("\\","\/"), null); 
+    const matchObj: LinkObject | undefined = await links_model.getLink(new_redirect.replace(/[^a-zA-Z0-9 ]/g, "_"), null); 
     const linkObj: LinkObject | undefined = await links_model.getLink(redirect_id, "by_id");
     let redirectObj: RedirectObject = {
         _id: new ObjectId,
@@ -25,7 +25,7 @@ export const editLink = asyncHandler(async (
         if (linkObj !== undefined){
             linkObj.shrinks.forEach((item: RedirectObject, i: number): void => {
                 if (item._id.toString() === redirect_id){
-                    linkObj.shrinks[i].link = new_redirect.replace("\\","\/");
+                    linkObj.shrinks[i].link = new_redirect.replace(/[^a-zA-Z0-9 ]/g, "_");
                     redirectObj = linkObj.shrinks[i]
                 }
             })

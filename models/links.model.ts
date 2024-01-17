@@ -24,8 +24,6 @@ export const getLink = asyncHandler(async (
             linkArr = await db.collection("links").find({ "shrinks._id": new ObjectId(prop) }).toArray();
             break;
         default:
-            param ?     
-            linkArr = await db.collection("links").find({ "shrinks.link": prop+"/"+param }).toArray():
             linkArr = await db.collection("links").find({ "shrinks.link": prop }).toArray();
             break;
     }
