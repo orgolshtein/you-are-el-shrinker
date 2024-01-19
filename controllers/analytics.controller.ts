@@ -20,7 +20,7 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
         case "redirects":
             links?.forEach((link: LinkObject): void => {
                 let count: number = link.shrinks.length;
-                countArr.push({site: link.target, counter: count})
+                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: count})
             })
             break;
         case "visits":
@@ -29,7 +29,7 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
                 link.shrinks.forEach((redirect: RedirectObject): void =>{
                     count += redirect.visits;
                 })
-                countArr.push({site: link.target, counter: count})
+                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: count})
             })
             break;
         case "latest":
@@ -41,8 +41,8 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
                     latest = Math.max(...latestSitesArr)
                 })
                 latest > 0 ?
-                countArr.push({site: link.target, counter: latest, visit_date: new Date(latest).toString()}):
-                countArr.push({site: link.target, counter: latest, visit_date: "None"})
+                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: latest, visit_date: new Date(latest).toString().substring(0,24)}):
+                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: latest, visit_date: "None"})
             })
             break;
     }
