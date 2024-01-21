@@ -61,7 +61,12 @@ export const getLinkStats = (
         link.shrinks.forEach((item: RedirectObject): void =>{
             if (item.link === redirect_link) {
                 no_match = false;
-                linkObj = { target: link.target, ...item, link: `${prod_link}/${item.link}` };
+                linkObj = { 
+                    target: link.target.replace(/https:\/\/|www./g, ""), 
+                    ...item, 
+                    last_visit: item.last_visit.substring(0,33), 
+                    link: `${prod_link}/${item.link}` 
+                };
             }
         })
     });
