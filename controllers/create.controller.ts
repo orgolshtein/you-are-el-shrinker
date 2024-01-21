@@ -15,11 +15,10 @@ const createUniqueHash = asyncHandler(async (): Promise<string | void> => {
 });
 
 export const createLink = asyncHandler(async (
-  target_value: string, 
-  param: string
+  target_value: string
   ): Promise<RedirectObject | undefined> => {
   const randomUniqueHash: string = await createUniqueHash();
-  const linkObj: LinkObject | undefined = await links_model.getLink(target_value, "by_target", param);
+  const linkObj: LinkObject | undefined = await links_model.getLink(target_value, "by_target");
   const newRedirectObj: RedirectObject = {
     _id: new ObjectId,
     link: randomUniqueHash,
@@ -30,14 +29,13 @@ export const createLink = asyncHandler(async (
   if (linkObj === undefined){
     let newLinkObj: LinkObject = {
       _id: new ObjectId,
-      target: param ? `https://${target_value}/${param}` : `https://${target_value}`, 
+      target: target_value, 
       shrinks: [{...newRedirectObj}]
     }
     await links_model.createLink(newLinkObj);
-    return {...newRedirectObj, output: `${prod_link}/${randomUniqueHash}`}
   } else {
     linkObj.shrinks.push(newRedirectObj);
     await links_model.updateLink(linkObj);
-    return {...newRedirectObj, output: `${prod_link}/${randomUniqueHash}`}
   }
+  return {...newRedirectObj, output: `${prod_link}/${randomUniqueHash}`}
 });

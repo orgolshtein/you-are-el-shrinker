@@ -61,10 +61,15 @@
 
     async function getNewLink(){
         try {
-            const target = document.querySelector("#target-link-input").value.replaceAll("\"","").replace("http://", "").replace("https://", "");
-            const url = `/api/create/${target}`;
+            const url = "/api/create";
             const options = {
-            method: 'POST' 
+            method: "POST",
+            headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    target: document.querySelector("#target-link-input").value
+                })
             };
             const res = await fetch(url,options)
             const data = await res.json();
@@ -90,7 +95,7 @@
         try{
             const url = `/api/edit/${id}`;
             const options = {
-                method: 'PATCH',
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -123,7 +128,7 @@
             url = `/api/analytics/${query}/${amount}`:
             url = `/api/analytics/${query}`
             const options = {
-            method: 'GET' 
+            method: "GET" 
             };
             const res = await fetch(url,options)
             const data = await res.json();
@@ -158,7 +163,7 @@
             const target = document.querySelector("#shrink-link-input").value.replaceAll("http://localhost:3020/","");
             const url = `/api/analytics/${target}`;
             const options = {
-            method: 'GET' 
+            method: "GET" 
             };
             const res = await fetch(url,options)
             const data = await res.json();

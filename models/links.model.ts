@@ -10,15 +10,12 @@ export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefin
 
 export const getLink = asyncHandler(async (
     prop: string, 
-    get_by: string | null, 
-    param?: string
+    get_by: string | null
     ): Promise<LinkObject | undefined> => {
     let linkArr: LinkObject[];
     switch (get_by) {
         case "by_target":
-            param ? 
-            linkArr = await db.collection("links").find({ target: `https://${prop}/${param}`}).toArray() :
-            linkArr = await db.collection("links").find({ target: `https://${prop}`}).toArray()
+            linkArr = await db.collection("links").find({ target: prop}).toArray()
             break;
         case "by_id":
             linkArr = await db.collection("links").find({ "shrinks._id": new ObjectId(prop) }).toArray();

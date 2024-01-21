@@ -20,7 +20,7 @@ router.patch("/:id", asyncRoute(async (req: Request, res: Response, next: NextFu
         if (req.body.new_link.length < 8){
             const redirectObj: RedirectObject | boolean | undefined = await edit_controller.editLink(
                 req.params.id, 
-                req.body.new_link
+                req.body.new_link.replace(/[^a-zA-Z0-9 ]/g, "_")
                 );
             if (redirectObj === false){
                 req.no_path_err = "Path is already in use";
