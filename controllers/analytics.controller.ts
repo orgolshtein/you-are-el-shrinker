@@ -73,9 +73,9 @@ export const getLinkStats = (
                 no_match = false;
                 linkObj = { 
                     target: format_target(link.target), 
-                    ...item, 
-                    last_visit: item.last_visit.substring(0,33), 
-                    link: `${prod_link}/${item.link}` 
+                    link: `${prod_link}/${item.link}`, 
+                    visits: item.visits,
+                    last_visit: item.last_visit.substring(0,33)
                 };
             }
         })
