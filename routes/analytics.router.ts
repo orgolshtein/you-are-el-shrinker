@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
 import * as analytics_controller from "../controllers/analytics.controller.js";
-import { StatsObject } from "../index.js";
+import { StatsObject, format_link } from "../index.js";
 import { asyncRoute } from "../middleware/async.handler.js";
 import { noPathHandler } from "../middleware/error.handler.js";
 
@@ -61,7 +61,7 @@ router.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: Ne
     const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
         req.links, 
         req.no_match, 
-        req.params.shrinked
+        format_link(req.params.shrinked)
         );
     if (typeof linkObj === "boolean"){
         req.no_path_err = "Link not found";

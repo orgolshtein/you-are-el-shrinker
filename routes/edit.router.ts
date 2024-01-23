@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
 import * as edit_controller from "../controllers/edit.controller.js";
-import { RedirectObject } from "../index.js";
+import { RedirectObject, format_link } from "../index.js";
 import { asyncRoute } from "../middleware/async.handler.js";
 import { noPathHandler } from "../middleware/error.handler.js";
 
@@ -20,7 +20,7 @@ router.patch("/:id", asyncRoute(async (req: Request, res: Response, next: NextFu
         if (req.body.new_link.length < 8){
             const redirectObj: RedirectObject | boolean | undefined = await edit_controller.editLink(
                 req.params.id, 
-                req.body.new_link.replace(/[^a-zA-Z0-9 ]/g, "_")
+                format_link(req.body.new_link)
                 );
             if (redirectObj === false){
                 req.no_path_err = "Path is already in use";

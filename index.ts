@@ -47,6 +47,7 @@ export const host: string | undefined = process.env.HOST;
 export const db_uri: string | undefined = process.env.DB_URI;
 export const db_name: string | undefined = process.env.DB_NAME;
 export const prod_link: string | undefined = process.env.PROD_LINK;
+export const format_link = (link: string): string => link.replace(/[^a-zA-Z0-9 ]/g, "_")
 
 app.use(cors());
 
@@ -68,7 +69,7 @@ app.use("/api/edit", editRouter);
 app.use("/api/analytics", analyticsRouter);
 
 app.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const target: string | undefined = await controller.useLink(req.params.shrinked);
+  const target: string | undefined = await controller.useLink(format_link(req.params.shrinked));
   target !== undefined ? res.redirect(target): noPathHandler(req, res);
 }));
 
@@ -81,6 +82,6 @@ app.use("*", noPathHandler);
 (asyncHandler(async (): Promise<void> => {
     await mongoConnect(db_uri, db_name);
     await app.listen( {port, host}, (): void => {
-      console.log(`Server is running at http://${host}:${port}`);
+      console.log(`Server is running at ${prod_link}`);
     })
 }))();

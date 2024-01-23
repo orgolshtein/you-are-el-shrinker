@@ -2,6 +2,8 @@ import * as links_model from "../models/links.model.js";
 import { LinkObject, RedirectObject, StatsObject, port, host, prod_link } from "../index.js";
 import { asyncHandler } from "../middleware/async.handler.js";
 
+const format_target = (target: string): string => target.replace(/https:\/\/|http:\/\/|www./g, "")
+
 export const getAllLinks = asyncHandler(async (): Promise<LinkObject[] | undefined> => {
     return await links_model.getAllLinks();
 });
@@ -20,7 +22,7 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
         case "redirects":
             links?.forEach((link: LinkObject): void => {
                 let count: number = link.shrinks.length;
-                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: count})
+                countArr.push({site: format_target(link.target), counter: count})
             })
             break;
         case "visits":
@@ -29,7 +31,7 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
                 link.shrinks.forEach((redirect: RedirectObject): void =>{
                     count += redirect.visits;
                 })
-                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: count})
+                countArr.push({site: format_target(link.target), counter: count})
             })
             break;
         case "latest":
@@ -41,8 +43,16 @@ export const getStats = (type: string, links: LinkObject[] | undefined): StatsOb
                     latest = Math.max(...latestSitesArr)
                 })
                 latest > 0 ?
-                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: latest, visit_date: new Date(latest).toString().substring(0,24)}):
-                countArr.push({site: link.target.replace(/https:\/\/|www./g, ""), counter: latest, visit_date: "None"})
+                countArr.push({
+                    site: format_target(link.target), 
+                    counter: latest, 
+                    visit_date: new Date(latest).toString().substring(0,24)
+                }):
+                countArr.push({
+                    site: format_target(link.target), 
+                    counter: latest, 
+                    visit_date: "None"
+                })
             })
             break;
     }
@@ -62,7 +72,7 @@ export const getLinkStats = (
             if (item.link === redirect_link) {
                 no_match = false;
                 linkObj = { 
-                    target: link.target.replace(/https:\/\/|www./g, ""), 
+                    target: format_target(link.target), 
                     ...item, 
                     last_visit: item.last_visit.substring(0,33), 
                     link: `${prod_link}/${item.link}` 
