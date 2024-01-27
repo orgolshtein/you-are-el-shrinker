@@ -160,10 +160,15 @@
     
     async function getShrinkedData(){
         try{
-            const target = document.querySelector("#shrink-link-input").value.replaceAll("http://localhost:3020/","");
-            const url = `/api/analytics/${target}`;
+            const url = "/api/analytics";
             const options = {
-            method: "GET" 
+            method: "POST",
+            headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    shrinked: document.querySelector("#shrink-link-input").value
+                }) 
             };
             const res = await fetch(url,options)
             const data = await res.json();

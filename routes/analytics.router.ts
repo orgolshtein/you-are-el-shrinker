@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 
 import * as analytics_controller from "../controllers/analytics.controller.js";
-import { StatsObject, format_link } from "../index.js";
+import { StatsObject, format_link, prod_link } from "../index.js";
 import { asyncRoute } from "../middleware/async.handler.js";
 import { noPathHandler } from "../middleware/error.handler.js";
 
@@ -57,17 +57,26 @@ router.get("/last-visited/:count", (req: Request, res: Response): void => {
         ));
 });
 
-router.get("/:shrinked", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
-        req.links, 
-        req.no_match, 
-        format_link(req.params.shrinked)
-        );
-    if (typeof linkObj === "boolean"){
-        req.no_path_err = "Link not found";
+router.post("/", asyncRoute(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (req.body.shrinked.length === 0){
+        req.no_path_err = "No input";
         noPathHandler(req, res);
     } else{
-        res.status(200).json({...linkObj});
+        const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
+            req.links, 
+            req.no_match, 
+            format_link(req.body.shrinked.replace(`${
+                prod_link?.includes("https") ? "http" : "https"
+            }`, `${
+                prod_link?.includes("https") ? "https" : "http"
+                }`).replace(`${prod_link}/`, ""))
+            );
+        if (typeof linkObj === "boolean"){
+            req.no_path_err = "Link not found";
+            noPathHandler(req, res);
+        } else{
+            res.status(200).json({...linkObj});
+        }
     }
 }));
 
