@@ -65,11 +65,7 @@ router.post("/", asyncRoute(async (req: Request, res: Response, next: NextFuncti
         const linkObj: StatsObject | boolean = await analytics_controller.getLinkStats(
             req.links, 
             req.no_match, 
-            format_link(req.body.shrinked.replace(`${
-                prod_link?.includes("https") ? "http" : "https"
-            }`, `${
-                prod_link?.includes("https") ? "https" : "http"
-                }`).replace(`${prod_link}/`, ""))
+            format_link(req.body.shrinked.replace(`${prod_link}/`, ""))
             );
         if (typeof linkObj === "boolean"){
             req.no_path_err = "Link not found";
